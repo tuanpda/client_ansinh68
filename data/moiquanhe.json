@@ -1,0 +1,94 @@
+[
+    {
+        "code": "00",
+        "name": "Chủ hộ"
+    },
+    {
+        "code": "01",
+        "name": "Vợ"
+    },
+    {
+        "code": "02",
+        "name": "Chồng"
+    },
+    {
+        "code": "03",
+        "name": "Bố"
+    },
+    {
+        "code": "04",
+        "name": "Mẹ"
+    },
+    {
+        "code": "05",
+        "name": "Em"
+    },
+    {
+        "code": "06",
+        "name": "Anh"
+    },
+    {
+        "code": "07",
+        "name": "Chị"
+    },
+    {
+        "code": "08",
+        "name": "Con"
+    },
+    {
+        "code": "09",
+        "name": "Cháu"
+    },
+    {
+        "code": "10",
+        "name": "Ông"
+    },
+    {
+        "code": "11",
+        "name": "Bà"
+    },
+    {
+        "code": "12",
+        "name": "Cô"
+    },
+    {
+        "code": "13",
+        "name": "Dì"
+    },
+    {
+        "code": "14",
+        "name": "Chú"
+    },
+    {
+        "code": "15",
+        "name": "Thím"
+    },
+    {
+        "code": "16",
+        "name": "Bác"
+    },
+    {
+        "code": "17",
+        "name": "Cậu"
+    },
+    {
+        "code": "18",
+        "name": "Mợ"
+    },
+    {
+        "code": "19",
+        "name": "Con dâu"
+    },
+    {
+        "code": "20",
+        "name": "Con dể"
+    },
+    {
+        "code": "21",
+        "name": "Chắt"
+    },
+    {
+        "code": "99",
+        "name": "Khác"
+    }
+]

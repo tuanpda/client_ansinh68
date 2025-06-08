@@ -1,0 +1,211 @@
+.table_wrapper {
+  display: block;
+  overflow: scroll;
+  white-space: nowrap;
+  position: sticky;
+  left: 0;
+}
+
+.input {
+  min-width: 200px;
+  /* Điều chỉnh độ rộng tùy ý */
+}
+
+.select {
+  min-width: 200px;
+  /* Điều chỉnh độ rộng tùy ý */
+}
+
+.field.is-tuanpda {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.field.is-grouped-function {
+  display: flex;
+  justify-content: center;
+}
+
+.modal-card {
+  width: 1450px;
+  height: auto;
+}
+
+.modal-card-kekhai {
+  width: 1250px;
+  height: auto;
+}
+
+.modal-card-fix-hoso {
+  width: 1250px;
+  height: auto;
+}
+
+/* Tùy chỉnh giao diện của input */
+.custom-input {
+  width: 50%;
+  height: 30px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 13px;
+}
+
+/* Tùy chỉnh giao diện của datalist */
+datalist {
+  position: absolute;
+  width: 100%;
+  max-height: 50px;
+  /* Điều chỉnh chiều cao tối đa của datalist */
+  overflow-y: auto;
+  /* Cho phép cuộn nếu danh sách quá dài */
+  border: 1px solid #ccc;
+  border-radius: 1px;
+  background-color: #fff;
+  z-index: 1;
+  /* Đảm bảo datalist hiển thị phía trên các phần tử khác */
+}
+
+/* Tùy chỉnh giao diện của các option trong datalist */
+datalist option {
+  padding: 8px;
+  cursor: pointer;
+}
+
+/* Tùy chỉnh giao diện của option được chọn */
+datalist option:checked {
+  background-color: #f0f0f0;
+}
+
+/* Tùy chỉnh giao diện của option mặc định */
+datalist option:not(:checked) {
+  background-color: transparent;
+}
+
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(255, 255, 255, 0.5);
+  /* Mờ nền */
+  z-index: 9999;
+  /* Đặt vị trí cao hơn */
+}
+
+/* CSS của biểu tượng loading */
+.loading-spinner {
+  border: 4px solid rgba(0, 0, 0, 0.1);
+  /* Màu đường viền của spinner */
+  border-top: 4px solid red;
+  /* Màu của đường viền phía trên */
+  border-radius: 50%;
+  /* Hình dạng của spinner */
+  width: 30px;
+  /* Chiều rộng của spinner */
+  height: 30px;
+  /* Chiều cao của spinner */
+  animation: spin 1s linear infinite;
+  /* Animation cho spinner */
+  position: absolute;
+  /* Đặt vị trí tuyệt đối */
+  top: 50%;
+  /* Đặt vị trí ở giữa theo chiều dọc */
+  left: 50%;
+  /* Đặt vị trí ở giữa theo chiều ngang */
+  transform: translate(-50%, -50%);
+  /* Dịch chuyển spinner về trung tâm */
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  /* Góc quay ban đầu */
+  100% {
+    transform: rotate(360deg);
+  }
+
+  /* Góc quay cuối cùng */
+}
+
+#preview {
+  display: flex;
+  justify-content: left;
+  align-items: left;
+}
+
+#preview img {
+  max-width: 100px;
+  max-height: 100px;
+  padding: 5px;
+}
+
+input:focus {
+  border-color: red;
+  /* Đổi màu viền thành đỏ */
+  box-shadow: 0 0 5px rgba(255, 0, 0, 0.5);
+  /* Thêm hiệu ứng bóng đổ */
+}
+
+select:focus {
+  border-color: red;
+  /* Đổi màu viền thành đỏ */
+  box-shadow: 0 0 5px rgba(255, 0, 0, 0.5);
+  /* Thêm hiệu ứng bóng đổ */
+}
+
+.titleKk {
+  position: relative;
+}
+
+.topleft {
+  position: absolute;
+  top: -13px;
+  font-size: 16px;
+  display: inline-block;
+  /* padding-left: 20px; */
+  padding-right: 15px;
+  background-color: white;
+  font-weight: bold;
+  color: #008b8b;
+}
+
+.line {
+  color: red;
+  margin-top: 20px;
+}
+
+.labelFix {
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.autocomplete {
+  position: relative;
+}
+
+.autocomplete-items {
+  position: absolute;
+  background-color: white;
+  border: 1px solid #d4d4d4;
+  border-bottom: none;
+  border-top: none;
+  z-index: 99;
+  top: 100%;
+  left: 0;
+  right: 0;
+}
+
+.autocomplete-item {
+  padding: 4px;
+  cursor: pointer;
+  border-bottom: 1px solid #d4d4d4;
+  font-size: small;
+}
+
+.autocomplete-item:hover {
+  background-color: #fffaeb;
+}
