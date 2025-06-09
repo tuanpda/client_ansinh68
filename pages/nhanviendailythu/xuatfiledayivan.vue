@@ -42,8 +42,9 @@
             <div class="select is-small is-fullwidth">
               <select @change="handleChange">
                 <option selected disabled>- Chọn loại hình -</option>
-                <option value="BI">Bảo hiểm y tế</option>
-                <option value="AR">Bảo hiểm y tế - HGĐ</option>
+                <option value="">Không chọn</option>
+                <option value="AR">Bảo hiểm y tế - Nông lâm - MSTB</option>
+                <option value="BI">Bảo hiểm y tế - HGĐ</option>
                 <option value="IS">Bảo hiểm xã hội tự nguyện</option>
                 <option value="IL">
                   Người tham gia lực lượng An ninh cơ sở
