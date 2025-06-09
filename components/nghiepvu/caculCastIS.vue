@@ -4476,7 +4476,7 @@ export default {
     },
 
     async inBienLaiDientu(data) {
-      // console.log(data);
+      // console.log("dữ liệu tạo pdf: ", data);
 
       // const res = await this.$axios(
       //   `/api/kekhai/bienlaidientu?_id_hskk=${item._id}&hosoIdentity=${item.hosoIdentity}`
@@ -4522,14 +4522,14 @@ export default {
       doc.setFont("OpenSans-Bold", "bold");
       doc.setFontSize(12);
       doc.setTextColor("#04368c");
-      doc.text(`BẢO HIỂM XÃ HỘI THỊ XÃ KỲ ANH`, 60, 10, {
+      doc.text(`BẢO HIỂM XÃ HỘI HUYỆN THẠCH HÀ`, 60, 10, {
         align: "center",
         fontWeight: "bold",
       });
 
       doc.setFontSize(12);
       doc.setTextColor("ff0000");
-      doc.text(`CÔNG TY TNHH AN SINH 159`, 60, 17, {
+      doc.text(`CÔNG TY TNHH MTV AN SINH 68`, 60, 17, {
         align: "center",
         fontWeight: "bold",
       });
@@ -4582,7 +4582,7 @@ export default {
       doc.setFontSize(9);
       doc.setTextColor("#00008b");
       doc.text(
-        `Do Công ty TNHH 159, tổ chức được Bảo hiểm xã hội uỷ quyền thu phát hành. `,
+        `Do Công ty TNHH MTV AN SINH 68, tổ chức được Bảo hiểm xã hội uỷ quyền thu phát hành. `,
         105,
         41,
         {
@@ -4741,7 +4741,7 @@ export default {
       doc.setFontSize(10);
       doc.setTextColor("#dc3545");
       doc.text(
-        `Đã được ký bởi: CÔNG TY TNHH AN SINH 159`,
+        `Đã được ký bởi: CÔNG TY TNHH MTV AN SINH 68`,
         toadoXInfo + 100,
         toadoYInfo + 53,
         {
