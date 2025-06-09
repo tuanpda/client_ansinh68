@@ -1781,7 +1781,7 @@ export default {
         `/api/danhmucs/dmbenhvienwithtinh-thachha?matinh=${this.matinh}`
       );
       this.dmbenhvien = res_benhvien.data;
-      console.log(this.dmbenhvien);
+      // console.log(this.dmbenhvien);
     } else {
       console.log("Người dùng chưa đăng nhập.");
       // Chuyển hướng người dùng đến trang đăng nhập
