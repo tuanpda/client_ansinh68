@@ -1396,6 +1396,7 @@
                     <div class="control">
                       <button
                         @click="hoanTatDongHs"
+                        :disabled="!lockButtonXacnhaninbldt"
                         class="button is-warning is-light is-small"
                       >
                         Đóng
