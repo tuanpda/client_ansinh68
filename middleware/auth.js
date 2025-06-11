@@ -1,9 +1,18 @@
 import cookieparser from "cookieparser";
 
-export default async function ({ store, redirect, req, app }) {
+export default async function ({ store, redirect, req, app, route }) {
   // console.log(req);
   // console.log(req.headers.cookie);
   // console.log('Middleware chạy ở:', process.server ? 'Server' : 'Client');
+
+  // Những route không cần login
+  const publicRoutes = ["/tracuubienlaidientu-ansinh68"];
+
+  if (publicRoutes.includes(route.path)) {
+    // Bỏ qua kiểm tra login cho route này
+    return;
+  }
+
   if (process.server) {
     const cookie = req && req.headers && req.headers.cookie;
 

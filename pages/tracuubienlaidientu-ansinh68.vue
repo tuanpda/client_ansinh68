@@ -129,12 +129,10 @@ export default {
         this.viewXacnhan = true;
 
         // tạo tên file PDF từ sobienlai và hoten
-        const sobienlai = res.data.hs.sobienlai;
-        const hoten = res.data.hs.hoten;
+        const urlNameInvoice = res.data.hs.urlNameInvoice;
 
         // encode để tránh lỗi Unicode trong URL
-        const fileName = `${sobienlai}_${hoten}`;
-        let pdfUrl = `http://27.73.37.94:4042/bienlaidientu/${fileName}.pdf`;
+        let pdfUrl = `http://14.224.129.177:1973/bienlaidientu/${urlNameInvoice}.pdf`;
         // console.log(this.pdfSrc);
 
         // this.pdfSrc = `http://27.73.37.94:4042/bienlaidientu/0000003_Th%C3%A1i%20B%C3%A1%20Long.pdf`;
