@@ -57,16 +57,16 @@ export default {
     // Workaround to avoid enforcing hard-coded localhost:3000: https://github.com/nuxt-community/axios-module/issues/308
     // baseURL: "/",
     // baseURL: "http://192.168.160.7:2612", // máy chủ nhân hoà
-    baseURL: "http://14.224.129.177:4209", // máy chủ tuanpda ansinh159
+    // baseURL: "http://14.224.129.177:4209", // máy chủ tuanpda ansinh159
     // baseURL: "http://27.73.37.94:1552", // máy chủ phủ diễn
-    // baseURL: "http://localhost:4209",
+    baseURL: "http://localhost:4209",
     credentials: true,
   },
 
   server: {
     port: 1973,
-    // host: "localhost",
-    host: "192.168.1.97", // máy chủ tuanpda ansinh159
+    host: "localhost",
+    // host: "192.168.1.97", // máy chủ tuanpda ansinh159
   },
 
   // server: {

@@ -44,12 +44,7 @@
               <td style="text-align: center">Hạn thẻ cũ</td>
               <td style="text-align: center">Đối tượng đóng</td>
               <td style="text-align: center">Số tháng</td>
-              <td
-                v-if="checkDong1lanchocacnamvesauVaConthieu == true"
-                style="text-align: center"
-              >
-                Số tháng đóng bù
-              </td>
+              <td style="text-align: center">Số tháng đóng bù</td>
               <td style="text-align: center">Số tiền phải đóng</td>
               <td style="text-align: center">Tỉnh / Thành phố</td>
               <td style="text-align: center">Quận / Huyện</td>
@@ -208,28 +203,7 @@
                 </td>
               </template>
               <template v-else>
-                <td
-                  v-if="checkDong1lanchocacnamvesauVaConthieu == false"
-                  style="text-align: center"
-                >
-                  <div class="select is-fullwidth is-small">
-                    <select
-                      v-model="item.madoituong"
-                      @change="doituongChange($event, index)"
-                      ref="doituongSelect"
-                    >
-                      <option selected disabled>- Chọn đối tượng đóng -</option>
-                      <option
-                        v-for="(dt, index) in item.doituong"
-                        :key="index"
-                        :value="dt.madoituong"
-                      >
-                        {{ dt.tendoituong }}
-                      </option>
-                    </select>
-                  </div>
-                </td>
-                <td v-else style="text-align: center">
+                <td style="text-align: center">
                   <div class="select is-fullwidth is-small">
                     <select
                       v-model="item.madoituong"
@@ -254,7 +228,7 @@
                 <td style="text-align: center">
                   <div class="select is-fullwidth is-small">
                     <select
-                      @change="phuongthucdChangeDongbu($event, addedIndex)"
+                      @change="phuongthucdChangeDongbu($event, index)"
                       ref="phuongthucdongSelect"
                     >
                       <option selected disabled>
@@ -272,7 +246,7 @@
                 </td>
 
                 <!-- nếu như đóng 1 lần còn thiếu và về sau thì thêm 1 ô nhập số tháng -->
-                <template v-if="checkDong1lanchocacnamvesauVaConthieu == true">
+                <template>
                   <td>
                     <input
                       v-if="NCT == true"
@@ -329,7 +303,7 @@
                 </td>
 
                 <!-- nếu như đóng 1 lần còn thiếu và về sau thì thêm 1 ô nhập số tháng -->
-                <template v-if="checkDong1lanchocacnamvesauVaConthieu == true">
+                <template>
                   <td>
                     <input
                       v-if="NCT == true"
@@ -362,7 +336,7 @@
                     />
                   </td>
                 </template>
-                <template v-else>
+                <!-- <template v-else>
                   <td style="text-align: center">
                     <input
                       v-mask="mask"
@@ -372,7 +346,7 @@
                       disabled
                     />
                   </td>
-                </template>
+                </template> -->
               </template>
 
               <!-- tỉnh-->
@@ -492,6 +466,7 @@
           </tbody>
         </table>
       </div>
+
       <div class="button-container">
         <!-- Các nút thêm dòng và gửi kê khai -->
         <button @click="addRow" class="button is-info is-small">
@@ -1067,10 +1042,7 @@
                   </div>
                 </template>
                 <template v-else>
-                  <div
-                    class="column"
-                    v-if="checkDong1lanchocacnamvesauVaConthieu == false"
-                  >
+                  <div class="column">
                     <div style="margin-bottom: 5px">
                       <label class="labelFix">Đối tượng đóng</label>
                     </div>
@@ -1095,7 +1067,7 @@
                       </div>
                     </div>
                   </div>
-                  <div class="column" v-else>
+                  <!-- <div class="column" v-else>
                     <div style="margin-bottom: 5px">
                       <label class="labelFix">Đối tượng đóng</label>
                     </div>
@@ -1119,7 +1091,7 @@
                         </select>
                       </div>
                     </div>
-                  </div>
+                  </div> -->
                 </template>
               </div>
 
@@ -1918,9 +1890,7 @@ export default {
     async findNguoihuong(masobhxh, index) {
       if (masobhxh !== "") {
         const isDuplicate = this.items.some(
-          (item, idx) =>
-            idx !== index &&
-            (item.masobhxh === masobhxh || item.cccd === this.items[index].cccd)
+          (item, idx) => idx !== index && item.masobhxh === masobhxh
         );
 
         if (isDuplicate) {
@@ -2461,8 +2431,8 @@ export default {
           const fileName = `${hs.sobienlai}_${encodeURIComponent(
             hs.hoten
           )}.pdf`;
-          const pdfUrl = `http://14.224.129.177:1973/bienlaidientu/${hs.urlNameInvoice}.pdf`;
-          // const pdfUrl = `http://localhost:1973/bienlaidientu/${hs.urlNameInvoice}.pdf`;
+          const pdfUrl = `http://14.224.129.177:1970/bienlaidientu/${hs.urlNameInvoice}.pdf`;
+          // const pdfUrl = `http://localhost:1970/bienlaidientu/${hs.urlNameInvoice}.pdf`;
           // console.log(pdfUrl);
 
           window.open(pdfUrl, "_blank");
@@ -3047,97 +3017,8 @@ export default {
       const tendoituong = e.target.options[e.target.selectedIndex].text;
       this.items[index].madoituong = madoituong;
       this.items[index].tendoituong = tendoituong;
-
-      // const mucDong = parseFloat(
-      //   this.items[index].muctiendong.replace(/,/g, "")
-      // );
-
-      // let castMucdong = mucDong * (this.tyledongbhyt / 100);
-      // let castSubTwhotro = this.chuanngheo * (this.tyledongbhyt / 100);
-      // let castDiaphuonght =
-      //   this.chuanngheo *
-      //   (this.tyledongbhyt / 100) *
-      //   (this.tylediaphuonghotroIs / 100);
-      // let castDiaphuonghtKhac =
-      //   this.chuanngheo *
-      //   (this.tyledongbhyt / 100) *
-      //   (this.tylehotrokhacIs / 100);
-
-      // if (this.items[index].madoituong === "BT") {
-      //   let madoituong = "";
-      //   for (let i = 0; i < this.doituongdong.length; i++) {
-      //     const doituong = this.doituongdong[i];
-      //     // CHÚNG TA TÌM TỶ LỆ HỖ TRỢ TƯƠNG ỨNG TẠI ĐÂY
-      //     if (doituong.madoituong === "BT") {
-      //       madoituong = doituong.tylehotro;
-      //     }
-      //   }
-
-      //   // Bắt đầu tính tiền
-      //   castSubTwhotro = castSubTwhotro * (madoituong / 100);
-      //   let tienPhaidong =
-      //     (castMucdong -
-      //       castSubTwhotro -
-      //       castDiaphuonght -
-      //       castDiaphuonghtKhac) *
-      //     parseFloat(this.items[index].maphuongthucdong);
-      //   this.items[index].sotien = tienPhaidong;
-      //   // console.log(this.items[index].sotien);
-      // } else if (this.items[index].madoituong === "CN") {
-      //   let madoituong = "";
-      //   for (let i = 0; i < this.doituongdong.length; i++) {
-      //     const doituong = this.doituongdong[i];
-      //     // CHÚNG TA TÌM TỶ LỆ HỖ TRỢ TƯƠNG ỨNG TẠI ĐÂY
-      //     if (doituong.madoituong === "CN") {
-      //       madoituong = doituong.tylehotro;
-      //     }
-      //   }
-
-      //   // Bắt đầu tính tiền
-      //   castSubTwhotro = castSubTwhotro * (madoituong / 100);
-      //   let tienPhaidong =
-      //     (castMucdong -
-      //       castSubTwhotro -
-      //       castDiaphuonght -
-      //       castDiaphuonghtKhac) *
-      //     parseFloat(this.items[index].maphuongthucdong);
-      //   this.items[index].sotien = tienPhaidong;
-      // } else if (this.items[index].madoituong === "N") {
-      //   let madoituong = "";
-      //   for (let i = 0; i < this.doituongdong.length; i++) {
-      //     const doituong = this.doituongdong[i];
-      //     // CHÚNG TA TÌM TỶ LỆ HỖ TRỢ TƯƠNG ỨNG TẠI ĐÂY
-      //     if (doituong.madoituong === "N") {
-      //       madoituong = doituong.tylehotro;
-      //     }
-      //   }
-
-      //   // Bắt đầu tính tiền
-      //   castSubTwhotro = castSubTwhotro * (madoituong / 100);
-      //   let tienPhaidong =
-      //     (castMucdong -
-      //       castSubTwhotro -
-      //       castDiaphuonght -
-      //       castDiaphuonghtKhac) *
-      //     parseFloat(this.items[index].maphuongthucdong);
-      //   this.items[index].sotien = tienPhaidong;
-      // } else if (this.items[index].madoituong === "NT") {
-      //   let madoituong = "";
-      //   for (let i = 0; i < this.doituongdong.length; i++) {
-      //     const doituong = this.doituongdong[i];
-      //     // CHÚNG TA TÌM TỶ LỆ HỖ TRỢ TƯƠNG ỨNG TẠI ĐÂY
-      //     if (doituong.madoituong === "NT") {
-      //       madoituong = doituong.tylehotro;
-      //     }
-      //   }
-
-      //   // Bắt đầu tính tiền
-      //   castSubTwhotro = castSubTwhotro * (madoituong / 100);
-      //   let tienPhaidong =
-      //     (castMucdong - castSubTwhotro - castDiaphuonghtKhac) *
-      //     parseFloat(this.items[index].maphuongthucdong);
-      //   this.items[index].sotien = tienPhaidong;
-      // }
+      // console.log(madoituong);
+      // console.log(tendoituong);
     },
 
     async phuongthucdChange(e, index) {
@@ -3347,156 +3228,20 @@ export default {
       const maphuongthucdong = e.target.value;
       const tenphuongthucdong = e.target.options[e.target.selectedIndex].text;
       // console.log(maphuongthucdong);
-      // console.log(this.items[index].maphuongthucdong);
+      // console.log(tenphuongthucdong);
 
       this.items[index].maphuongthucdong = maphuongthucdong;
       this.items[index].tenphuongthucdong = tenphuongthucdong;
       this.items[index].sothang = 0;
 
-      if (maphuongthucdong == "D1LNCT" || maphuongthucdong == "D1LNVS") {
-        this.checkDong1lanchocacnamvesauVaConthieu = true;
-        if (maphuongthucdong == "D1LNCT") {
-          this.NCT = true;
-          this.NVS = false;
-        }
-        if (maphuongthucdong == "D1LNVS") {
-          this.NVS = true;
-          this.NCT = false;
-        }
-      } else {
-        this.checkDong1lanchocacnamvesauVaConthieu = false;
+      if (maphuongthucdong == "D1LNCT") {
+        this.NCT = true;
+        this.NVS = false;
       }
-
-      // console.log(`NCT: ${this.NCT}`);
-      // console.log(`NVS: ${this.NVS}`);
-
-      // // tính số tiền phải nạp
-      // // console.log(this.items[index].muctiendong);
-      // // console.log(typeof(this.items[index].muctiendong));
-
-      // // ***  CÁC TỶ LỆ HỖ TRỢ ĐƯA VÀO DANH MỤC VÀ THAY ĐỔI THEO TỪNG ĐỊA PHƯƠNG
-      // // 1. this.tyledongbhyt (tỷ lệ đóng 22% .. thay đổi thì vào danh mục)
-      // // 2. this.chuanngeo (mức chuẩn nghèo do nhà nước quy định)
-      // // 3. this.tylediaphuonghotroIs (tỷ lệ này do địa phương - do tỉnh - từng nơi qy định)
-      // // 4. this.tylehotrokhacIs (các tỷ lệ khác đôi khi do từng huyện xin được hỗ trợ)
-
-      // // mức tiền đóng do lao động lựa chọn
-      // // cái này phải yêu cầu chọn chẵn tiền ví dụ 1.050.000 hoặc 1.300.000 không được lẻ như 1.020.000
-      // // khống chế < 20 lần lương cơ bản (<20*1.800.000)
-      // const mucDong = parseFloat(
-      //   this.items[index].muctiendong.replace(/,/g, "")
-      // );
-      // // console.log(typeof mucDong);
-      // // console.log(mucDong);
-
-      // // công thức tính cần đưa danh mục
-      // // tỷ lệ đóng: 22%
-      // // chuẩn hộ nghèo: 1500000
-
-      // // lương cơ sở là 1800000
-      // // hạn chế không được nhập mức tiền đóng > luongcoso * 20 (lần)
-
-      // // công thức tính đóng hàng tháng háng
-      // // ((mức tiền lương chọn đóng * tỷ lệ đóng) -
-      // // (chuẩn hộ nghèo * tỷ lệ đóng * 10% (NSTW hỗ trợ cho đối tượng BT))) * số tháng
-      // // tách đối tượng đóng:
-
-      // let castMucdong = mucDong * (this.tyledongbhyt / 100);
-      // let castSubTwhotro = this.chuanngheo * (this.tyledongbhyt / 100);
-      // let castDiaphuonght =
-      //   this.chuanngheo *
-      //   (this.tyledongbhyt / 100) *
-      //   (this.tylediaphuonghotroIs / 100);
-      // let castDiaphuonghtKhac =
-      //   this.chuanngheo *
-      //   (this.tyledongbhyt / 100) *
-      //   (this.tylehotrokhacIs / 100);
-
-      // // console.log(castDiaphuonght, castDiaphuonghtKhac);
-
-      // // console.log(castMucdong);
-      // // console.log(castSubTwhotro);
-      // // console.log(castDiaphuonght);
-
-      // // Bắt đầu tính tiền khi người dùng chọn số tháng nạp
-      // // Ở đây với mỗi đối tượng đóng được chọn thì sẽ có công thức tính khác nhau
-      // // console.log(this.items[index].madoituong);
-      // // console.log(this.doituongdong);
-      // if (this.items[index].madoituong === "BT") {
-      //   let madoituong = "";
-      //   for (let i = 0; i < this.doituongdong.length; i++) {
-      //     const doituong = this.doituongdong[i];
-      //     // CHÚNG TA TÌM TỶ LỆ HỖ TRỢ TƯƠNG ỨNG TẠI ĐÂY
-      //     if (doituong.madoituong === "BT") {
-      //       madoituong = doituong.tylehotro;
-      //     }
-      //   }
-
-      //   // Bắt đầu tính tiền
-      //   castSubTwhotro = castSubTwhotro * (madoituong / 100);
-      //   let tienPhaidong =
-      //     (castMucdong -
-      //       castSubTwhotro -
-      //       castDiaphuonght -
-      //       castDiaphuonghtKhac) *
-      //     parseFloat(this.items[index].maphuongthucdong);
-      //   this.items[index].sotien = tienPhaidong;
-      //   // console.log(this.items[index].sotien);
-      // } else if (this.items[index].madoituong === "CN") {
-      //   let madoituong = "";
-      //   for (let i = 0; i < this.doituongdong.length; i++) {
-      //     const doituong = this.doituongdong[i];
-      //     // CHÚNG TA TÌM TỶ LỆ HỖ TRỢ TƯƠNG ỨNG TẠI ĐÂY
-      //     if (doituong.madoituong === "CN") {
-      //       madoituong = doituong.tylehotro;
-      //     }
-      //   }
-
-      //   // Bắt đầu tính tiền
-      //   castSubTwhotro = castSubTwhotro * (madoituong / 100);
-      //   let tienPhaidong =
-      //     (castMucdong -
-      //       castSubTwhotro -
-      //       castDiaphuonght -
-      //       castDiaphuonghtKhac) *
-      //     parseFloat(this.items[index].maphuongthucdong);
-      //   this.items[index].sotien = tienPhaidong;
-      // } else if (this.items[index].madoituong === "N") {
-      //   let madoituong = "";
-      //   for (let i = 0; i < this.doituongdong.length; i++) {
-      //     const doituong = this.doituongdong[i];
-      //     // CHÚNG TA TÌM TỶ LỆ HỖ TRỢ TƯƠNG ỨNG TẠI ĐÂY
-      //     if (doituong.madoituong === "N") {
-      //       madoituong = doituong.tylehotro;
-      //     }
-      //   }
-
-      //   // Bắt đầu tính tiền
-      //   castSubTwhotro = castSubTwhotro * (madoituong / 100);
-      //   let tienPhaidong =
-      //     (castMucdong -
-      //       castSubTwhotro -
-      //       castDiaphuonght -
-      //       castDiaphuonghtKhac) *
-      //     parseFloat(this.items[index].maphuongthucdong);
-      //   this.items[index].sotien = tienPhaidong;
-      // } else if (this.items[index].madoituong === "NT") {
-      //   let madoituong = "";
-      //   for (let i = 0; i < this.doituongdong.length; i++) {
-      //     const doituong = this.doituongdong[i];
-      //     // CHÚNG TA TÌM TỶ LỆ HỖ TRỢ TƯƠNG ỨNG TẠI ĐÂY
-      //     if (doituong.madoituong === "NT") {
-      //       madoituong = doituong.tylehotro;
-      //     }
-      //   }
-
-      //   // Bắt đầu tính tiền
-      //   castSubTwhotro = castSubTwhotro * (madoituong / 100);
-      //   let tienPhaidong =
-      //     (castMucdong - castSubTwhotro - castDiaphuonghtKhac) *
-      //     parseFloat(this.items[index].maphuongthucdong);
-      //   this.items[index].sotien = tienPhaidong;
-      // }
+      if (maphuongthucdong == "D1LNVS") {
+        this.NVS = true;
+        this.NCT = false;
+      }
     },
 
     // phương án
@@ -4476,7 +4221,7 @@ export default {
     },
 
     async inBienLaiDientu(data) {
-      // console.log("dữ liệu tạo pdf: ", data);
+      // console.log(data);
 
       // const res = await this.$axios(
       //   `/api/kekhai/bienlaidientu?_id_hskk=${item._id}&hosoIdentity=${item.hosoIdentity}`
@@ -4522,14 +4267,14 @@ export default {
       doc.setFont("OpenSans-Bold", "bold");
       doc.setFontSize(12);
       doc.setTextColor("#04368c");
-      doc.text(`BẢO HIỂM XÃ HỘI HUYỆN THẠCH HÀ`, 60, 10, {
+      doc.text(`BẢO HIỂM XÃ HỘI THỊ XÃ KỲ ANH`, 60, 10, {
         align: "center",
         fontWeight: "bold",
       });
 
       doc.setFontSize(12);
       doc.setTextColor("ff0000");
-      doc.text(`CÔNG TY TNHH MTV AN SINH 68`, 60, 17, {
+      doc.text(`CÔNG TY TNHH AN SINH 159`, 60, 17, {
         align: "center",
         fontWeight: "bold",
       });
@@ -4582,7 +4327,7 @@ export default {
       doc.setFontSize(9);
       doc.setTextColor("#00008b");
       doc.text(
-        `Do Công ty TNHH MTV AN SINH 68, tổ chức được Bảo hiểm xã hội uỷ quyền thu phát hành. `,
+        `Do Công ty TNHH 159, tổ chức được Bảo hiểm xã hội uỷ quyền thu phát hành. `,
         105,
         41,
         {
@@ -4741,7 +4486,7 @@ export default {
       doc.setFontSize(10);
       doc.setTextColor("#dc3545");
       doc.text(
-        `Đã được ký bởi: CÔNG TY TNHH MTV AN SINH 68`,
+        `Đã được ký bởi: CÔNG TY TNHH AN SINH 159`,
         toadoXInfo + 100,
         toadoYInfo + 53,
         {

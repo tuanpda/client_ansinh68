@@ -247,7 +247,6 @@
 
         <!-- Sử dụng v-bind để truyền props vào component con -->
         <div v-if="maloaihinh == 'AR'">
-          <!-- <ArTable :maloaihinh="maloaihinh" :loaihinh="loaihinh" /> -->
           <ArTable
             ref="ArTable"
             v-if="maloaihinh === 'AR'"
@@ -256,7 +255,6 @@
           />
         </div>
         <div v-if="maloaihinh == 'BI'">
-          <!-- <BiTable :maloaihinh="maloaihinh" :loaihinh="loaihinh" /> -->
           <BiTable
             ref="BiTable"
             v-if="maloaihinh === 'BI'"
@@ -265,7 +263,6 @@
           />
         </div>
         <div v-if="maloaihinh == 'IS'">
-          <!-- <ISTable :maloaihinh="maloaihinh" :loaihinh="loaihinh" /> -->
           <ISTable
             ref="ISTable"
             v-if="maloaihinh === 'IS'"
@@ -274,10 +271,25 @@
           />
         </div>
         <div v-if="maloaihinh == 'IL'">
-          <!-- <ISTable :maloaihinh="maloaihinh" :loaihinh="loaihinh" /> -->
           <ILTable
             ref="ILTable"
             v-if="maloaihinh === 'IL'"
+            :maloaihinh="maloaihinh"
+            :loaihinh="loaihinh"
+          />
+        </div>
+        <div v-if="maloaihinh == 'WI'">
+          <WITable
+            ref="WITable"
+            v-if="maloaihinh === 'WI'"
+            :maloaihinh="maloaihinh"
+            :loaihinh="loaihinh"
+          />
+        </div>
+        <div v-if="maloaihinh == 'IT'">
+          <ITTable
+            ref="ITTable"
+            v-if="maloaihinh === 'IT'"
             :maloaihinh="maloaihinh"
             :loaihinh="loaihinh"
           />
@@ -292,6 +304,8 @@ import ArTable from "@/components/nghiepvu/caculCastAR";
 import BiTable from "@/components/nghiepvu/caculCastBI";
 import ISTable from "@/components/nghiepvu/caculCastIS";
 import ILTable from "@/components/nghiepvu/caculCastIL";
+import WITable from "@/components/nghiepvu/caculCastWI";
+import ITTable from "@/components/nghiepvu/caculCastIT";
 
 import Swal from "sweetalert2";
 import createNumberMask from "text-mask-addons/dist/createNumberMask";
@@ -308,6 +322,8 @@ export default {
     BiTable,
     ISTable,
     ILTable,
+    WITable,
+    ITTable,
   },
 
   data() {

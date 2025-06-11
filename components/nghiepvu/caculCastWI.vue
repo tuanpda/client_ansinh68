@@ -15,17 +15,24 @@
               </button>
             </p>
             <p class="control">
-              <button class="button is-small is-info">
+              <button @click="importKekhai" class="button is-small is-info">
                 <span class="icon">
                   <i class="fas fa-file-import"></i>
                 </span>
-                <span>Import tờ khai</span>
+                <span>Import kê khai</span>
+              </button>
+            </p>
+            <p class="control">
+              <button class="button is-small is-warning">
+                <span class="icon">
+                  <i class="fas fa-file-download"></i>
+                </span>
+                <span>Tải về mẫu Import</span>
               </button>
             </p>
           </div>
         </div>
       </div>
-
       <div class="table_wrapper">
         <table
           class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth"
@@ -41,16 +48,19 @@
               <td style="text-align: center">CCCD</td>
               <td style="text-align: center">Điện thoại</td>
               <td style="text-align: center">Phương án</td>
-              <td style="text-align: center">Mức tiền đóng</td>
+              <td style="text-align: center">Lương cơ sở</td>
+              <td style="text-align: center">Tỷ lệ NSTW %</td>
+              <td style="text-align: center">Tỷ lệ NSĐP %</td>
+              <td style="text-align: center">Tỷ lệ HT khác</td>
               <td style="text-align: center">Hạn thẻ cũ</td>
-              <td style="text-align: center">Đối tượng đóng</td>
               <td style="text-align: center">Số tháng</td>
-              <td style="text-align: center">Số tháng đóng bù</td>
               <td style="text-align: center">Số tiền phải đóng</td>
               <td style="text-align: center">Tỉnh / Thành phố</td>
               <td style="text-align: center">Quận / Huyện</td>
               <td style="text-align: center">Xã phường</td>
               <td style="text-align: center">Tổ thôn</td>
+              <!--<td style="text-align: center">Bệnh viện tỉnh</td> -->
+              <td style="text-align: center">Bệnh viện</td>
               <td style="text-align: center">Hình thức nạp</td>
               <td style="text-align: center">Ghi chú</td>
               <!-- <td style="text-align: center">Số biên lai</td>
@@ -166,195 +176,76 @@
 
               <td style="text-align: center">
                 <input
-                  v-model="item.muctiendong"
+                  v-model="item.tienluongcs"
                   class="input is-small"
                   type="text"
                   v-mask="mask"
-                  @blur="limitTiendong(item.muctiendong, index)"
+                  disabled
                 />
               </td>
-
               <td style="text-align: center">
                 <input
-                  v-model="hanthecu"
-                  type="text"
-                  placeholder="MM/YYYY"
+                  v-model="item.tylensnnht"
                   class="input is-small"
+                  type="number"
                 />
               </td>
-
-              <template v-if="item.maphuongan == 'DB'">
-                <td style="text-align: center">
-                  <div class="select is-fullwidth is-small">
-                    <select
-                      v-model="item.madoituong"
-                      @change="doituongChangeDongbu($event, index)"
-                      ref="doituongSelect"
+              <td style="text-align: center">
+                <input
+                  v-model="item.tylensdp"
+                  class="input is-small"
+                  type="number"
+                />
+              </td>
+              <td style="text-align: center">
+                <input
+                  v-model="item.hotrokhac"
+                  class="input is-small"
+                  type="number"
+                />
+              </td>
+              <!-- <td style="text-align: center">
+                <input
+                  v-model="item.tungay"
+                  type="text"
+                  class="input is-small"
+                />
+              </td> -->
+              <td style="text-align: center">
+                <input v-model="hanthecu" type="text" class="input is-small" />
+              </td>
+              <td style="text-align: center">
+                <div class="select is-fullwidth is-small">
+                  <select
+                    v-model="item.maphuongthucdong"
+                    @change="phuongthucdChange($event, index)"
+                    ref="phuongthucdongSelect"
+                  >
+                    <option selected disabled>- Chọn phương thức đóng -</option>
+                    <option
+                      v-for="(ptd, index) in item.phuongthucdong"
+                      :key="index"
+                      :value="ptd.maphuongthuc"
                     >
-                      <option selected disabled>- Chọn đối tượng đóng -</option>
-                      <option
-                        v-for="(dt, index) in item.doituong"
-                        :key="index"
-                        :value="dt.madoituong"
-                      >
-                        {{ dt.tendoituong }}
-                      </option>
-                    </select>
-                  </div>
-                </td>
-              </template>
-              <template v-else>
-                <td style="text-align: center">
-                  <div class="select is-fullwidth is-small">
-                    <select
-                      v-model="item.madoituong"
-                      @change="doituongChange($event, index)"
-                      ref="doituongSelect"
-                    >
-                      <option selected disabled>- Chọn đối tượng đóng -</option>
-                      <option
-                        v-for="(dt, index) in item.doituong"
-                        :key="index"
-                        :value="dt.madoituong"
-                      >
-                        {{ dt.tendoituong }}
-                      </option>
-                    </select>
-                  </div>
-                </td>
-              </template>
-
-              <!-- nếu đóng bù -->
-              <template v-if="item.maphuongan == 'DB'">
-                <td style="text-align: center">
-                  <div class="select is-fullwidth is-small">
-                    <select
-                      @change="phuongthucdChangeDongbu($event, index)"
-                      ref="phuongthucdongSelect"
-                    >
-                      <option selected disabled>
-                        - Chọn phương thức đóng -
-                      </option>
-                      <option
-                        v-for="(item, index) in phuongthucdongDongbu"
-                        :key="index"
-                        :value="item.maphuongthuc"
-                      >
-                        {{ item.tenphuongthuc }}
-                      </option>
-                    </select>
-                  </div>
-                </td>
-
-                <!-- nếu như đóng 1 lần còn thiếu và về sau thì thêm 1 ô nhập số tháng -->
-                <template>
-                  <td>
-                    <input
-                      v-if="NCT == true"
-                      v-model="item.sothang"
-                      class="input is-small"
-                      style="font-weight: 800; color: red"
-                      type="number"
-                      min="0"
-                      max="120"
-                      @blur="maxNCTItem(item, index)"
-                    />
-                    <input
-                      v-else="NVS == true"
-                      v-model="item.sothang"
-                      class="input is-small"
-                      style="font-weight: 800; color: red"
-                      type="number"
-                      min="0"
-                      max="80"
-                      @blur="maxNVSItem(item, index)"
-                    />
-                  </td>
-                </template>
-
-                <td style="text-align: center">
-                  <input
-                    v-model="item.sotien"
-                    v-mask="mask"
-                    class="input is-small"
-                    style="font-weight: 800; color: red"
-                  />
-                </td>
-              </template>
-              <template v-else>
-                <td style="text-align: center">
-                  <div class="select is-fullwidth is-small">
-                    <select
-                      v-model="item.maphuongthucdong"
-                      @change="phuongthucdChange($event, index)"
-                      ref="phuongthucdongSelect"
-                    >
-                      <option selected disabled>
-                        - Chọn phương thức đóng -
-                      </option>
-                      <option
-                        v-for="(ptd, index) in item.phuongthucdong"
-                        :key="index"
-                        :value="ptd.maphuongthuc"
-                      >
-                        {{ ptd.tenphuongthuc }}
-                      </option>
-                    </select>
-                  </div>
-                </td>
-
-                <!-- nếu như đóng 1 lần còn thiếu và về sau thì thêm 1 ô nhập số tháng -->
-                <template>
-                  <td>
-                    <input
-                      v-if="NCT == true"
-                      v-model="item.sothang"
-                      class="input is-small"
-                      style="font-weight: 800; color: red"
-                      type="number"
-                      min="0"
-                      max="120"
-                      @blur="maxNCTItem(item, index)"
-                    />
-                    <input
-                      v-else="NVS == true"
-                      v-model="item.sothang"
-                      class="input is-small"
-                      style="font-weight: 800; color: red"
-                      type="number"
-                      min="0"
-                      max="80"
-                      @blur="maxNVSItem(item, index)"
-                    />
-                  </td>
-
-                  <td>
-                    <input
-                      v-mask="mask"
-                      v-model="item.sotien"
-                      class="input is-small"
-                      style="font-weight: 800; color: red"
-                    />
-                  </td>
-                </template>
-                <!-- <template v-else>
-                  <td style="text-align: center">
-                    <input
-                      v-mask="mask"
-                      v-model="item.sotien"
-                      class="input is-small"
-                      style="font-weight: 800; color: red"
-                      disabled
-                    />
-                  </td>
-                </template> -->
-              </template>
-
+                      {{ ptd.tenphuongthuc }}
+                    </option>
+                  </select>
+                </div>
+              </td>
+              <td style="text-align: center">
+                <input
+                  v-mask="mask"
+                  v-model="item.sotien"
+                  class="input is-small"
+                  style="font-weight: 800; color: red"
+                  disabled
+                />
+              </td>
               <!-- tỉnh-->
               <td style="text-align: center">
                 <div class="select is-fullwidth is-small">
                   <select
-                    v-model="item.info_tinh.matinh"
+                    v-model="item.matinh"
                     @change="provinceChange($event, index)"
                   >
                     <option
@@ -420,6 +311,62 @@
                 />
               </td>
 
+              <!-- tỉnh bệnh viện -->
+              <!-- <td style="text-align: center">
+                <div class="select is-fullwidth is-small">
+                  <select
+                    @change="benhvienChange($event, index)"
+                    v-model="item.matinh"
+                  >
+                    <option
+                      v-for="(dt, index) in dmtinhthanhpho"
+                      :key="index"
+                      :value="dt.matinh"
+                    >
+                      {{ dt.tentinh }}
+                    </option>
+                  </select>
+                </div>
+              </td> -->
+              <!-- bệnh viện -->
+              <!-- <td style="text-align: center">
+                <input
+                  autoComplete="on"
+                  list="hopSuggestions"
+                  class="custom-input"
+                  @change="hopChange($event, index)"
+                  ref="hopInput"
+                  style="min-width: 200px; height: 30px"
+                  v-model="item.tenbenhvien"
+                />
+                <datalist id="hopSuggestions">
+                  <option
+                    v-for="(item, index) in item.info_benhvien"
+                    :key="index"
+                  >
+                    {{ item.mabenhvien }} - {{ item.tenbenhvien }}
+                  </option>
+                </datalist>
+              </td> -->
+
+              <td style="text-align: center">
+                <div class="select is-fullwidth is-small">
+                  <select
+                    v-model="item.mabenhvien"
+                    @change="hopChangeReset($event, index)"
+                    ref="hopInput"
+                  >
+                    <option
+                      v-for="(nt, idx) in item.info_benhvien"
+                      :key="idx"
+                      :value="nt.mabenhvien"
+                    >
+                      {{ nt.tenbenhvien }}
+                    </option>
+                  </select>
+                </div>
+              </td>
+
               <td>
                 <div class="select is-fullwidth is-small">
                   <select
@@ -467,7 +414,6 @@
           </tbody>
         </table>
       </div>
-
       <div class="button-container">
         <!-- Các nút thêm dòng và gửi kê khai -->
         <button @click="addRow" class="button is-info is-small">
@@ -481,7 +427,7 @@
           <span class="icon is-small">
             <i class="fas fa-envelope-open-text"></i>
           </span>
-          <span>Lưu hồ sơ</span>
+          <span>Nạp kê khai</span>
         </button>
 
         <!-- Tổng số tiền, nằm bên phải -->
@@ -501,7 +447,7 @@
       <span>waitting some minute ...</span>
     </div>
 
-    <!-- modal ke khai thành công-->
+    <!-- modal nạp hồ sơ thành công -->
     <div class="">
       <div :class="{ 'is-active': isActive }" class="modal">
         <div class="modal-background"></div>
@@ -524,7 +470,7 @@
                 <hr class="line" />
                 <div class="topleft">
                   <span style="color: red; font-weight: 700">1.</span> Thông tin
-                  hồ sơ nạp
+                  lưu hồ sơ kê khai
                 </div>
               </div>
               <div class="columns">
@@ -592,7 +538,7 @@
                 <hr class="line" />
                 <div class="topleft">
                   <span style="color: red; font-weight: 700">2.</span> Danh sách
-                  kê khai
+                  kê khai thành công
                 </div>
               </div>
               <div class="columns">
@@ -602,7 +548,7 @@
                       class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth"
                     >
                       <thead>
-                        <tr style="background-color: #85e89d; font-size: small">
+                        <tr style="background-color: #fff0f5; font-size: small">
                           <td style="text-align: center; font-weight: bold">
                             STT
                           </td>
@@ -676,6 +622,7 @@
                   </div>
                 </div>
               </div>
+
               <div class="titleKk" style="margin-top: 10px">
                 <hr class="line" />
                 <div class="topleft">
@@ -962,6 +909,22 @@
                 </div>
               </div>
               <div class="columns">
+                <div class="column is-2">
+                  <div style="margin-bottom: 5px">
+                    <label class="labelFix">Lương CS</label>
+                  </div>
+                  <div>
+                    <input
+                      v-model="datanhaphosomodal.tienluongcs"
+                      class="input is-small"
+                      type="text"
+                      v-mask="mask"
+                      disabled
+                    />
+                  </div>
+                </div>
+              </div>
+              <div class="columns">
                 <div class="column">
                   <div style="margin-bottom: 5px">
                     <label class="labelFix">Phương án</label>
@@ -970,7 +933,7 @@
                     <select
                       @change="phuonganChange($event, addedIndex)"
                       ref="phuonganSelect"
-                      v-model="selectedOptionpa"
+                      v-model="selectedOption"
                     >
                       <option selected disabled>- Chọn phương án -</option>
                       <option
@@ -983,294 +946,106 @@
                     </select>
                   </div>
                 </div>
+
                 <div class="column">
                   <div style="margin-bottom: 5px">
-                    <label class="labelFix">Mức thu nhập hàng tháng</label>
+                    <label class="labelFix">Tỷ lệ NSTW %</label>
                   </div>
                   <div>
                     <input
-                      v-model="datanhaphosomodal.muctiendong"
+                      v-model="datanhaphosomodal.tylensnnht"
                       class="input is-small"
-                      type="text"
-                      v-mask="mask"
-                      @blur="
-                        limitTiendong(datanhaphosomodal.muctiendong, addedIndex)
-                      "
+                      type="number"
                     />
                   </div>
                 </div>
                 <div class="column">
                   <div style="margin-bottom: 5px">
+                    <label class="labelFix">Tỷ lệ NSĐP %</label>
+                  </div>
+                  <div>
+                    <input
+                      v-model="datanhaphosomodal.tylensdp"
+                      class="input is-small"
+                      type="number"
+                    />
+                  </div>
+                </div>
+                <div class="column">
+                  <div style="margin-bottom: 5px">
+                    <label class="labelFix">Hỗ trợ khác</label>
+                  </div>
+                  <div>
+                    <input
+                      v-model="datanhaphosomodal.hotrokhac"
+                      class="input is-small"
+                      type="number"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div class="columns">
+                <div class="column">
+                  <div style="margin-bottom: 5px">
                     <label class="labelFix">Hạn thẻ cũ</label>
                   </div>
                   <div>
+                    <!-- <input
+                      v-model="datanhaphosomodal.tungay"
+                      class="input is-small"
+                      type="text"
+                    /> -->
                     <td style="text-align: center">
                       <input
                         v-model="hanthecu"
                         type="text"
-                        placeholder="MM/YYYY"
                         class="input is-small"
                       />
                     </td>
                   </div>
                 </div>
-
-                <template v-if="datanhaphosomodal.maphuongan == 'DB'">
-                  <div class="column">
-                    <div style="margin-bottom: 5px">
-                      <label class="labelFix">Đối tượng đóng</label>
-                    </div>
-                    <div>
-                      <div class="select is-fullwidth is-small">
-                        <select
-                          @change="doituongChangeDongbu($event, addedIndex)"
-                          ref="doituongSelect"
-                          v-model="selectedOptionDoituongdong"
+                <div class="column">
+                  <div style="margin-bottom: 5px">
+                    <label class="labelFix">Số tháng</label>
+                  </div>
+                  <div>
+                    <div class="select is-fullwidth is-small">
+                      <select
+                        @change="phuongthucdChange($event, addedIndex)"
+                        ref="phuongthucdongSelect"
+                        v-model="selectedOptionptd"
+                      >
+                        <option selected disabled>
+                          - Chọn phương thức đóng -
+                        </option>
+                        <option
+                          v-for="(
+                            item, index
+                          ) in datanhaphosomodal.phuongthucdong"
+                          :key="index"
+                          :value="item.maphuongthuc"
                         >
-                          <option selected disabled>
-                            - Chọn đối tượng đóng -
-                          </option>
-                          <option
-                            v-for="(item, index) in datanhaphosomodal.doituong"
-                            :key="index"
-                            :value="item.madoituong"
-                          >
-                            {{ item.tendoituong }}
-                          </option>
-                        </select>
-                      </div>
+                          {{ item.tenphuongthuc }}
+                        </option>
+                      </select>
                     </div>
                   </div>
-                </template>
-                <template v-else>
-                  <div
-                    class="column"
-                    v-if="checkDong1lanchocacnamvesauVaConthieu == false"
-                  >
-                    <div style="margin-bottom: 5px">
-                      <label class="labelFix">Đối tượng đóng</label>
-                    </div>
-                    <div>
-                      <div class="select is-fullwidth is-small">
-                        <select
-                          @change="doituongChange($event, addedIndex)"
-                          ref="doituongSelect"
-                          v-model="selectedOptionDoituongdong"
-                        >
-                          <option selected disabled>
-                            - Chọn đối tượng đóng -
-                          </option>
-                          <option
-                            v-for="(item, index) in datanhaphosomodal.doituong"
-                            :key="index"
-                            :value="item.madoituong"
-                          >
-                            {{ item.tendoituong }}
-                          </option>
-                        </select>
-                      </div>
-                    </div>
+                </div>
+                <div class="column">
+                  <div style="margin-bottom: 5px">
+                    <label class="labelFix">Số tiền phải đóng</label>
                   </div>
-                  <div class="column" v-else>
-                    <div style="margin-bottom: 5px">
-                      <label class="labelFix">Đối tượng đóng</label>
-                    </div>
-                    <div>
-                      <div class="select is-fullwidth is-small">
-                        <select
-                          @change="doituongChangeDongbu($event, addedIndex)"
-                          ref="doituongSelect"
-                          v-model="selectedOptionDoituongdong"
-                        >
-                          <option selected disabled>
-                            - Chọn đối tượng đóng -
-                          </option>
-                          <option
-                            v-for="(item, index) in datanhaphosomodal.doituong"
-                            :key="index"
-                            :value="item.madoituong"
-                          >
-                            {{ item.tendoituong }}
-                          </option>
-                        </select>
-                      </div>
-                    </div>
+                  <div>
+                    <input
+                      v-mask="mask"
+                      v-model="datanhaphosomodal.sotien"
+                      class="input is-small"
+                      style="font-weight: 800; color: red"
+                      disabled
+                    />
                   </div>
-                </template>
-              </div>
-
-              <div class="columns">
-                <!-- đoạn này nếu chọn đóng bù thì phải code input khác -->
-                <template v-if="datanhaphosomodal.maphuongan == 'DB'">
-                  <div class="column">
-                    <div style="margin-bottom: 5px">
-                      <label class="labelFix">Số tháng</label>
-                    </div>
-                    <div>
-                      <div class="select is-fullwidth is-small">
-                        <select
-                          @change="phuongthucdChangeDongbu($event, addedIndex)"
-                          ref="phuongthucdongSelect"
-                        >
-                          <option selected disabled>
-                            - Chọn phương thức đóng -
-                          </option>
-                          <option
-                            v-for="(item, index) in phuongthucdongDongbu"
-                            :key="index"
-                            :value="item.maphuongthuc"
-                          >
-                            {{ item.tenphuongthuc }}
-                          </option>
-                        </select>
-                      </div>
-                    </div>
-                  </div>
-
-                  <!-- nếu như đóng 1 lần còn thiếu và về sau thì thêm 1 ô nhập số tháng -->
-                  <template
-                    v-if="checkDong1lanchocacnamvesauVaConthieu == true"
-                  >
-                    <div class="column">
-                      <div style="margin-bottom: 5px">
-                        <label class="labelFix">Số tháng</label>
-                      </div>
-                      <div>
-                        <input
-                          v-if="NCT == true"
-                          v-model="datanhaphosomodal.sothang"
-                          class="input is-small"
-                          style="font-weight: 800; color: red"
-                          type="number"
-                          min="0"
-                          max="120"
-                          @blur="maxNCT"
-                          placeholder="NCT"
-                        />
-                        <input
-                          v-else="NVS == true"
-                          v-model="datanhaphosomodal.sothang"
-                          class="input is-small"
-                          style="font-weight: 800; color: red"
-                          type="number"
-                          min="0"
-                          max="80"
-                          @blur="maxNVS"
-                          placeholder="NVS"
-                        />
-                      </div>
-                    </div>
-                  </template>
-
-                  <div class="column">
-                    <div style="margin-bottom: 5px">
-                      <label class="labelFix">Số tiền phải đóng</label>
-                    </div>
-                    <div>
-                      <input
-                        v-mask="mask"
-                        v-model="datanhaphosomodal.sotien"
-                        class="input is-small"
-                        style="font-weight: 800; color: red"
-                      />
-                    </div>
-                  </div>
-                </template>
-
-                <template v-else>
-                  <div class="column">
-                    <div style="margin-bottom: 5px">
-                      <label class="labelFix">Số tháng</label>
-                    </div>
-                    <div>
-                      <div class="select is-fullwidth is-small">
-                        <select
-                          @change="phuongthucdChange($event, addedIndex)"
-                          ref="phuongthucdongSelect"
-                          v-model="selectedOptionptd"
-                        >
-                          <option selected disabled>
-                            - Chọn phương thức đóng -
-                          </option>
-                          <option
-                            v-for="(
-                              item, index
-                            ) in datanhaphosomodal.phuongthucdong"
-                            :key="index"
-                            :value="item.maphuongthuc"
-                          >
-                            {{ item.tenphuongthuc }}
-                          </option>
-                        </select>
-                      </div>
-                    </div>
-                  </div>
-
-                  <!-- nếu như đóng 1 lần còn thiếu và về sau thì thêm 1 ô nhập số tháng -->
-                  <template
-                    v-if="checkDong1lanchocacnamvesauVaConthieu == true"
-                  >
-                    <div class="column">
-                      <div style="margin-bottom: 5px">
-                        <label class="labelFix">Số tháng đóng bù</label>
-                      </div>
-                      <div>
-                        <input
-                          v-if="NCT == true"
-                          v-model="datanhaphosomodal.sothang"
-                          class="input is-small"
-                          style="font-weight: 800; color: red"
-                          type="number"
-                          min="0"
-                          max="120"
-                          @blur="maxNCT"
-                        />
-                        <input
-                          v-else="NVS == true"
-                          v-model="datanhaphosomodal.sothang"
-                          class="input is-small"
-                          style="font-weight: 800; color: red"
-                          type="number"
-                          min="0"
-                          max="80"
-                          @blur="maxNVS"
-                        />
-                      </div>
-                    </div>
-
-                    <div class="column">
-                      <div style="margin-bottom: 5px">
-                        <label class="labelFix">Số tiền phải đóng</label>
-                      </div>
-                      <div>
-                        <input
-                          v-mask="mask"
-                          v-model="datanhaphosomodal.sotien"
-                          class="input is-small"
-                          style="font-weight: 800; color: red"
-                        />
-                      </div>
-                    </div>
-                  </template>
-
-                  <template v-else>
-                    <div class="column">
-                      <div style="margin-bottom: 5px">
-                        <label class="labelFix">Số tiền phải đóng</label>
-                      </div>
-                      <div>
-                        <input
-                          v-mask="mask"
-                          v-model="datanhaphosomodal.sotien"
-                          class="input is-small"
-                          style="font-weight: 800; color: red"
-                          disabled
-                        />
-                      </div>
-                    </div>
-                  </template>
-                </template>
-
+                </div>
                 <div class="column">
                   <div style="margin-bottom: 5px">
                     <label class="labelFix">Hình thức nạp tiền</label>
@@ -1330,7 +1105,7 @@
                         :key="index"
                         :value="dt.maquanhuyen"
                       >
-                        {{ dt.tenquanhuyen }}
+                        {{ dt.maquanhuyen }} - {{ dt.tenquanhuyen }}
                       </option>
                     </select>
                   </div>
@@ -1379,6 +1154,81 @@
               <div class="columns">
                 <div class="column">
                   <div style="margin-bottom: 5px">
+                    <label class="labelFix">Bệnh viện tỉnh</label>
+                  </div>
+                  <div>
+                    <div class="select is-fullwidth is-small">
+                      <select
+                        @change="benhvienChange($event, addedIndex)"
+                        v-model="datanhaphosomodal.matinh"
+                      >
+                        <option
+                          v-for="(dt, index) in dmtinhthanhpho"
+                          :key="index"
+                          :value="dt.matinh"
+                        >
+                          {{ dt.tentinh }}
+                        </option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+                <div class="column">
+                  <div style="margin-bottom: 5px">
+                    <label class="labelFix">Bệnh viện</label>
+                  </div>
+                  <!-- <div>
+                    <input
+                      autoComplete="on"
+                      list="hopSuggestions"
+                      class="custom-input"
+                      @change="hopChange($event, addedIndex)"
+                      ref="hopInput"
+                      style="min-width: 300px; height: 30px"
+                      :value="datanhaphosomodal.tenbenhvien"
+                    />
+                    <datalist id="hopSuggestions">
+                      <option
+                        v-for="(item, index) in datanhaphosomodal.info_benhvien"
+                        :key="index"
+                      >
+                        {{ item.mabenhvien }} - {{ item.tenbenhvien }}
+                      </option>
+                    </datalist>
+                  </div> -->
+                  <!-- <div>
+                    <v-select
+                      :options="datanhaphosomodal.info_benhvien"
+                      v-model="benhvienInfo"
+                      label="tenbenhvien"
+                      placeholder="Tìm kiếm..."
+                      append-to-body
+                      direction="top"
+                      :styles="customStyles"
+                    ></v-select>
+                  </div> -->
+                  <div class="select is-fullwidth is-small">
+                    <select
+                      v-model="selectedOptionBenhvien"
+                      @change="hopChange($event, addedIndex)"
+                    >
+                      <option selected disabled>
+                        - Chọn cơ sở khám chữa bệnh -
+                      </option>
+                      <option
+                        v-for="(item, index) in datanhaphosomodal.info_benhvien"
+                        :key="index"
+                        :value="item.mabenhvien"
+                      >
+                        {{ item.mabenhvien }} - {{ item.tenbenhvien }}
+                      </option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+              <div class="columns">
+                <div class="column">
+                  <div style="margin-bottom: 5px">
                     <label class="labelFix">Ghi chú</label>
                   </div>
                   <div>
@@ -1390,8 +1240,7 @@
                   </div>
                 </div>
               </div>
-
-              <!-- <hr class="navbar-divider" /> -->
+              <hr class="navbar-divider" />
               <div class="columns">
                 <div class="column" style="margin-top: 10px">
                   <div
@@ -1561,6 +1410,224 @@
         </div>
       </div>
     </div>
+
+    <!-- modal import dữ liệu kê khai -->
+    <div class="">
+      <div :class="{ 'is-active': isActive_import }" class="modal">
+        <div class="modal-background"></div>
+        <div class="modal-content modal-card-kekhai box">
+          <section class="modal-card-kekhai-body">
+            <div>
+              <div>
+                <span style="font-weight: 800; font-size: 15px; color: #3cb371"
+                  >Import dữ liệu kê khai</span
+                >
+              </div>
+              <div style="text-align: end">
+                <button
+                  @click="isActive_import = false"
+                  class="button is-small is-info"
+                >
+                  Thoát
+                </button>
+              </div>
+            </div>
+            <div>
+              <div class="titleKk">
+                <hr class="line" />
+                <div class="topleft">
+                  <span style="color: red; font-weight: 700">1.</span> Chọn file
+                  dữ liệu
+                </div>
+              </div>
+              <div class="columns">
+                <div class="column">
+                  <div>
+                    <div class="file is-info has-name is-small">
+                      <label class="file-label">
+                        <input
+                          @change="onFileChange"
+                          class="file-input"
+                          type="file"
+                          name="resume"
+                        />
+                        <span class="file-cta">
+                          <span class="file-icon">
+                            <i class="fas fa-upload"></i>
+                          </span>
+                          <span class="file-label"> Chọn file dữ liệu </span>
+                        </span>
+                        <span class="file-name">
+                          {{ fileName }}
+                        </span>
+                      </label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="titleKk" style="margin-top: 10px">
+                <hr class="line" />
+                <div class="topleft">
+                  <span style="color: red; font-weight: 700">2.</span> Danh sách
+                  kê khai
+                </div>
+              </div>
+              <div class="columns table_wrapper">
+                <div class="column">
+                  <div v-if="items.length > 0">
+                    <table
+                      class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth"
+                    >
+                      <thead>
+                        <tr style="font-size: small; background-color: #fff8dc">
+                          <td style="text-align: center; width: 3%">STT</td>
+                          <td style="text-align: center">Mã số BHXH</td>
+                          <td style="text-align: center">Họ tên</td>
+                          <td style="text-align: center">Ngày sinh</td>
+                          <td style="text-align: center">Giới tính</td>
+                          <td style="text-align: center">CCCD</td>
+                          <td style="text-align: center">Điện thoại</td>
+                          <td style="text-align: center">Phương án</td>
+                          <td style="text-align: center">Lương cơ sở</td>
+                          <td style="text-align: center">Tỷ lệ NSTW %</td>
+                          <td style="text-align: center">Tỷ lệ NSĐP %</td>
+                          <td style="text-align: center">Tỷ lệ HT khác</td>
+                          <td style="text-align: center">Từ ngày</td>
+                          <td style="text-align: center">Số tháng</td>
+                          <td style="text-align: center">Số tiền phải đóng</td>
+                          <td style="text-align: center">Tỉnh / Thành phố</td>
+                          <td style="text-align: center">Quận / Huyện</td>
+                          <td style="text-align: center">Xã phường</td>
+                          <td style="text-align: center">Tổ thôn</td>
+                          <td style="text-align: center">Bệnh viện tỉnh</td>
+                          <td style="text-align: center">Bệnh viện</td>
+                          <td style="text-align: center">Ghi chú</td>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr
+                          v-for="(item, index) in items"
+                          :key="index"
+                          style="font-size: small"
+                        >
+                          <td
+                            style="text-align: center; vertical-align: middle"
+                          >
+                            {{ index + 1 }}
+                          </td>
+                          <td style="text-align: center; font-weight: 500">
+                            {{ item.masobhxh }}
+                          </td>
+                          <td style="text-align: center; font-weight: 500">
+                            {{ item.hoten }}
+                          </td>
+                          <td style="text-align: center">
+                            {{ formatISODateToDMY(item.ngaysinh) }}
+                          </td>
+                          <td style="text-align: center">
+                            {{ item.gioitinh }}
+                          </td>
+                          <td style="text-align: center; font-weight: 500">
+                            {{ item.cccd }}
+                          </td>
+                          <td style="text-align: center; font-weight: 500">
+                            {{ item.dienthoai }}
+                          </td>
+                          <td style="text-align: center">
+                            {{ item.tenphuongan }}
+                          </td>
+                          <td style="text-align: center">
+                            {{ item.tienluongcs }}
+                          </td>
+                          <td style="text-align: center">
+                            {{ item.tylensnnht }}
+                          </td>
+                          <td style="text-align: center">
+                            {{ item.tylensdp }}
+                          </td>
+                          <td style="text-align: center">
+                            {{ item.hotrokhac }}
+                          </td>
+                          <td style="text-align: center">
+                            {{ formatISODateToDMY(item.tungay) }}
+                          </td>
+                          <td style="text-align: center">
+                            {{ item.tenphuongthucdong }}
+                          </td>
+                          <td
+                            style="
+                              text-align: center;
+                              font-weight: 500;
+                              color: red;
+                            "
+                          >
+                            {{ formatCurrency(item.sotien) }}
+                          </td>
+                          <!-- tỉnh-->
+                          <td style="text-align: center">
+                            {{ item.tentinh }}
+                          </td>
+                          <!-- quận huyện -->
+                          <td style="text-align: center">
+                            {{ item.tenquanhuyen }}
+                          </td>
+                          <!-- xã phường -->
+                          <td>
+                            {{ item.tenxaphuong }}
+                          </td>
+                          <!-- tổ thôn -->
+                          <td>
+                            {{ item.tothon }}
+                          </td>
+                          <!-- tỉnh bệnh viện -->
+                          <td style="text-align: center">
+                            {{ item.benhvientinh }}
+                          </td>
+                          <!-- bệnh viện -->
+                          <td>
+                            {{ item.tenbenhvien }}
+                          </td>
+                          <!-- ghi chú -->
+                          <td>
+                            {{ item.ghichu }}
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+              <hr class="navbar-divider" />
+              <div class="columns">
+                <div class="column" style="margin-top: 10px">
+                  <div
+                    class="field is-grouped is-flex is-justify-content-center"
+                  >
+                    <div class="control">
+                      <button
+                        @click="onSave"
+                        class="button is-success is-small"
+                      >
+                        Xác nhận nạp hồ sơ
+                      </button>
+                    </div>
+                    <div class="control">
+                      <button
+                        @click="cancelImport"
+                        class="button is-warning is-light is-small"
+                      >
+                        Hủy xác nhận
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -1575,6 +1642,7 @@ const currencyMask = createNumberMask({
   allowNegative: false,
 });
 import Swal from "sweetalert2";
+import XLSX from "xlsx";
 import DatePicker from "vue2-datepicker";
 import "vue2-datepicker/index.css";
 import vSelect from "vue-select";
@@ -1597,7 +1665,6 @@ import num2words from "vn-num2words";
 
 export default {
   name: "calCastAR",
-  middleware: "auth",
   mixins: [mixinDmBhxh],
 
   // nhận mã loại hình và tên loại hình từ page kekhai
@@ -1611,13 +1678,14 @@ export default {
       isActive: false,
       isActive_nhaphoso: false,
       isActive_xacnhan: false,
+      isActive_import: false,
       mask: currencyMask,
       items: [],
-      selectedOptionHtnt: "- Chọn hình thức nạp tiền -",
-      selectedOptionpa: "- Chọn phương án -",
+      template_items: [],
+      selectedOption: "- Chọn phương án -",
       selectedOptionptd: "- Chọn phương thức đóng -",
-      selectedOptionDoituongdong: "- Chọn đối tượng đóng -",
-      selectedOptionptdDongbu: "- Chọn phương thức đóng -",
+      selectedOptionHtnt: "- Chọn hình thức nạp tiền -",
+      selectedOptionBenhvien: "- Chọn cơ sở khám chữa bệnh -",
       phuongan: [
         {
           maphuongan: "TM",
@@ -1627,49 +1695,20 @@ export default {
           maphuongan: "ON",
           tenphuongan: "Đóng tiếp",
         },
-        {
-          maphuongan: "DB",
-          tenphuongan: "Đóng bù",
-        },
-      ],
-      phuongthucdongDongbu: [
-        { maphuongthuc: "1", tenphuongthuc: "1 tháng" },
-        { maphuongthuc: "2", tenphuongthuc: "2 tháng" },
-        { maphuongthuc: "3", tenphuongthuc: "3 tháng" },
-        { maphuongthuc: "4", tenphuongthuc: "4 tháng" },
-        { maphuongthuc: "5", tenphuongthuc: "5 tháng" },
-        { maphuongthuc: "6", tenphuongthuc: "6 tháng" },
-        { maphuongthuc: "7", tenphuongthuc: "7 tháng" },
-        { maphuongthuc: "8", tenphuongthuc: "8 tháng" },
-        { maphuongthuc: "9", tenphuongthuc: "9 tháng" },
-        { maphuongthuc: "10", tenphuongthuc: "10 tháng" },
-        { maphuongthuc: "11", tenphuongthuc: "11 tháng" },
-        { maphuongthuc: "12", tenphuongthuc: "12 tháng" },
-        {
-          maphuongthuc: "D1LNCT",
-          tenphuongthuc: "Đóng 1 lần cho những năm còn thiếu (Nghỉ hưu)",
-        },
-        {
-          maphuongthuc: "D1LNVS",
-          tenphuongthuc: "Đóng 1 lần cho những năm về sau",
-        },
       ],
       luongcoso: 0,
       tylengansachtw: 0,
       tylenngansachdp: 0,
-      tyledongbhyt: 0,
-      chuanngheo: 0,
-      tylediaphuonghotroIs: 10, // hiện tại là đang để 0
-      tylehotrokhacIs: 0,
       hotrokhac: 0,
       matinh: "",
       tentinh: "",
       dmquanhuyen: [],
       dmbenhvien: [],
       checkXaphuongOpen: false, // khóa xã phường khi load form
-      isLoading: false,
       form_response_sucess: [],
       form_response_failed: [],
+      isLoading: false,
+
       formKekhai: {
         sohoso: "",
         dotkekhai: "",
@@ -1680,14 +1719,16 @@ export default {
       // phục vụ việc nhập item từ modal
       addedIndex: 0,
       datanhaphosomodal: {},
+
+      // thêm cho việc import dữ liệu kê khai từ file execl
+      fileName: "",
+      selectedFile: null,
       isRoleSent: false,
+
       benhvienInfo: null,
 
-      checkDong1lanchocacnamvesauVaConthieu: false,
-      NVS: false,
-      NCT: false,
-
       hanthecu: "",
+
       dulieuInbienlai: [],
       dulieuTravedeinbienlai: [],
       lockButtonXacnhaninbldt: false, // khóa nút xác nhận biên lai khi đã gửi
@@ -1695,8 +1736,10 @@ export default {
   },
 
   mounted() {
-    // this.tinhDenThang("10/2024", "12");
     this.isRoleSent = this.user.res_sent;
+    // console.log(this.isRoleSent);
+
+    // this.test();
   },
 
   async created() {
@@ -1707,12 +1750,8 @@ export default {
       // console.log(this.nguoithu);
       // console.log(this.phuongthucdong);
       // console.log(this.doituongdong);
-      // console.log(this.doituongdongil);
       // console.log(this.dmtylehotro);
       // console.log(this.dmtinhthanhpho);
-      // console.log(this.dmtyledongbhtn);
-      // console.log(this.dmchuanngheo);
-      // console.log(this.dmtylehotrodiaphuongis);
       if (this.dmluongcs.length > 0) {
         this.luongcoso = this.dmluongcs[0].luongcs;
       }
@@ -1720,25 +1759,11 @@ export default {
         this.tylengansachtw = this.dmtylehotro[0].tylengansachtw;
         this.tylenngansachdp = this.dmtylehotro[0].tylenngansachdp;
         this.hotrokhac = this.dmtylehotro[0].tylehotrokhac;
-      }
-      if (this.dmtyledongbhtn.length > 0) {
-        this.tyledongbhyt = this.dmtyledongbhtn[0].tyledong;
-        // console.log(this.tyledongbhyt);
-      }
-      if (this.dmchuanngheo.length > 0) {
-        this.chuanngheo = this.dmchuanngheo[0].chuanngheo;
-        // console.log(this.chuanngheo);
-      }
-      if (this.dmtylehotrodiaphuongis.length > 0) {
-        this.tylediaphuonghotroIs =
-          this.dmtylehotrodiaphuongis[0].tylediaphuong;
-        this.tylehotrokhacIs = this.dmtylehotrodiaphuongis[0].tylekhac;
-        // console.log(this.tylediaphuonghotroIs);
-        // console.log(this.tylehotrokhacIs);
+        // console.log(this.tylengansachtw, this.tylenngansachdp);
       }
       if (this.phuongthucdong.length > 0) {
         this.phuongthucdong = this.phuongthucdong.filter(
-          (item) => item.maloaihinh !== "AR"
+          (item) => item.maloaihinh !== "IS"
         );
       }
     });
@@ -1754,11 +1779,11 @@ export default {
       );
       this.dmquanhuyen = res_quanhuyen.data;
       const res_benhvien = await this.$axios.get(
-        `/api/danhmucs/dmbenhvienwithtinh?matinh=${this.matinh}`
+        `/api/danhmucs/dmbenhvienwithtinh-camxuyen?matinh=${this.matinh}`
       );
       this.dmbenhvien = res_benhvien.data;
     } else {
-      // console.log("Người dùng chưa đăng nhập.");
+      console.log("Người dùng chưa đăng nhập.");
       // Chuyển hướng người dùng đến trang đăng nhập
       this.$router.push("/login");
     }
@@ -1789,108 +1814,36 @@ export default {
       }
       return 0; // Trường hợp không có dữ liệu
     },
+
+    customStyles() {
+      return {
+        dropdown: (base) => ({
+          ...base,
+          maxHeight: "50px", // Giảm chiều cao tối đa của danh sách
+          overflowY: "auto", // Thêm thanh cuộn
+        }),
+        dropdownMenu: (base) => ({
+          ...base,
+          direction: "top", // Hướng xổ lên
+        }),
+      };
+    },
+
+    formattedDate: {
+      get() {
+        // item.tungay dạng DD/MM/YYYY → YYYY-MM-DD
+        const [day, month, year] = this.item.tungay.split("/");
+        return `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
+      },
+      set(value) {
+        // YYYY-MM-DD → DD/MM/YYYY
+        const [year, month, day] = value.split("-");
+        this.item.tungay = `${day}/${month}/${year}`;
+      },
+    },
   },
 
   methods: {
-    async checkItem() {
-      const isDataValid = await this.checkFormData();
-      if (!isDataValid) {
-        // Dừng quá trình lưu dữ liệu nếu dữ liệu không hợp lệ
-        return;
-      } else {
-        const Toast = Swal.mixin({
-          toast: true,
-          position: "top-end",
-          showConfirmButton: false,
-          timer: 3000,
-          timerProgressBar: true,
-          didOpen: (toast) => {
-            toast.addEventListener("mouseenter", Swal.stopTimer);
-            toast.addEventListener("mouseleave", Swal.resumeTimer);
-          },
-        });
-        Toast.fire({
-          icon: "success",
-          title: `Bản ghi đã đầy đủ dữ liệu!`,
-        });
-      }
-    },
-
-    maxNCT() {
-      if (this.datanhaphosomodal.sothang > 120) {
-        Swal.fire({
-          text: `Số tháng đóng bù không được lớn hơn 120 tháng`,
-          icon: "error",
-        });
-      }
-      if (this.datanhaphosomodal.sothang < 0) {
-        Swal.fire({
-          text: `Số tháng đóng bù không được nhập nhỏ hơn 0`,
-          icon: "error",
-        });
-      }
-    },
-
-    maxNVS() {
-      if (this.datanhaphosomodal.sothang > 80) {
-        Swal.fire({
-          text: `Số tháng đóng bù không được lớn hơn 80 tháng`,
-          icon: "error",
-        });
-      }
-      if (this.datanhaphosomodal.sothang < 0) {
-        Swal.fire({
-          text: `Số tháng đóng bù không được nhập nhỏ hơn 0`,
-          icon: "error",
-        });
-      }
-    },
-
-    maxNCTItem(item, index) {
-      // console.log(item);
-      // console.log(index);
-
-      const value = item.sothang;
-
-      // console.log(value);
-
-      if (value > 120) {
-        Swal.fire({
-          text: `Hàng ${
-            index + 1
-          }: Số tháng đóng bù không được lớn hơn 120 tháng`,
-          icon: "error",
-        });
-      } else if (value < 0) {
-        Swal.fire({
-          text: `Hàng ${index + 1}: Số tháng đóng bù không được nhỏ hơn 0`,
-          icon: "error",
-        });
-      }
-    },
-
-    maxNVSItem(item, index) {
-      // console.log(item);
-      // console.log(index);
-      const value = item.sothang;
-
-      // console.log(value);
-
-      if (value > 80) {
-        Swal.fire({
-          text: `Hàng ${
-            index + 1
-          }: Số tháng đóng bù không được lớn hơn 80 tháng`,
-          icon: "error",
-        });
-      } else if (value < 0) {
-        Swal.fire({
-          text: `Hàng ${index + 1}: Số tháng đóng bù không được nhỏ hơn 0`,
-          icon: "error",
-        });
-      }
-    },
-
     async findNguoihuong(masobhxh, index) {
       if (masobhxh !== "") {
         const isDuplicate = this.items.some(
@@ -1909,17 +1862,25 @@ export default {
         }
 
         try {
+          // const res = await this.$axios.get(
+          //   `/api/nguoihuong/find-nguoihuong-masobhxh-theodstg?soBhxh=${masobhxh}`
+          // );
           const res = await this.$axios.get(
-            `/api/nguoihuong/find-nguoihuong-masobhxh-theodulieutunguyen?soBhxh=${masobhxh}`
+            `/api/nguoihuong/find-nguoihuong-masobhxh-theodstg-timhanthe?soSoBhxh=${masobhxh}`
           );
-          // console.log(res.data.data[0]);
-
           this.isLoading = true;
           // console.log(res.data);
-          if (res.data.data.length > 0) {
-            this.isLoading = false;
-
-            const data = res.data.data[0];
+          if (res.data.length > 0) {
+            // Tìm bản ghi có denNgay lớn nhất
+            const latestRecord = res.data.reduce((max, curr) => {
+              const currDate = new Date(
+                curr.denNgay.split("/").reverse().join("/")
+              );
+              const maxDate = new Date(
+                max.denNgay.split("/").reverse().join("/")
+              );
+              return currDate > maxDate ? curr : max;
+            });
 
             // tìm căn cước công dân trong dữ liệu TG
             const resHGD = await this.$axios.get(
@@ -1932,6 +1893,12 @@ export default {
               // console.log(resHGD);
             }
 
+            this.isLoading = false;
+
+            // Gán bản ghi có denNgay lớn nhất
+            const data = latestRecord;
+            // console.log(data);
+
             try {
               this.items[index].hoten = data.hoTen;
               this.items[index].ngaysinh = data.ngaySinh;
@@ -1942,61 +1909,82 @@ export default {
               } else {
                 this.items[index].gioitinh = "Nữ";
               }
+
+              // this.items[index].cccd = data.soCmnd;
               this.items[index].dienthoai = data.soDienThoai;
 
+              // CODE TÌM HẠN THẺ TỪ 05/06/2025
               // gán hạn thẻ cũ lên form
-              this.hanthecu = data.denThang;
-              // this.items[index].tuthang = data.denThang;
-              const [thangStr, namStr] = data.denThang.split("/"); // "04/2025"
-              let thang = parseInt(thangStr);
-              let nam = parseInt(namStr);
+              this.hanthecu = data.denNgay;
+              const denNgayStr = data.denNgay; // vd: "10/10/2024"
+              // const denNgayStr = "15/03/2025";
 
-              // Cộng thêm 1 tháng
-              thang += 1;
+              // Hàm parse định dạng dd/mm/yyyy thành Date
+              const parseDate = (str) => {
+                const [day, month, year] = str.split("/").map(Number);
+                return new Date(year, month - 1, day);
+              };
 
-              if (thang > 12) {
-                thang = 1;
-                nam += 1;
+              // Hàm format Date về dd/mm/yyyy
+              const formatDate = (date) => {
+                const d = String(date.getDate()).padStart(2, "0");
+                const m = String(date.getMonth() + 1).padStart(2, "0");
+                const y = date.getFullYear();
+                return `${d}/${m}/${y}`;
+              };
+
+              const today = new Date();
+              const denNgay = parseDate(denNgayStr);
+              const bienLai = today;
+
+              // console.log("đến ngày: ", denNgay);
+              // console.log("biên lai: ", bienLai);
+
+              let tuNgay;
+
+              if (denNgay >= today) {
+                // Chưa hết hạn → ngày kế tiếp
+                const nextDay = new Date(denNgay);
+                nextDay.setDate(nextDay.getDate() + 1);
+                tuNgay = nextDay;
+              } else {
+                const daysDiff = (today - denNgay) / (1000 * 60 * 60 * 24);
+                if (daysDiff > 90) {
+                  // Hết hạn > 3 tháng → sau hôm nay 30 ngày
+                  const next30 = new Date();
+                  next30.setDate(next30.getDate() + 30);
+                  tuNgay = next30;
+                } else {
+                  // Hết hạn < 3 tháng → dùng ngày biên lai
+                  tuNgay = bienLai;
+                }
               }
 
-              // Định dạng lại chuỗi theo MM/YYYY
-              const hantheMoi = `${thang.toString().padStart(2, "0")}/${nam}`;
-              this.items[index].tuthang = hantheMoi; // gán hạn thẻ mới vào ô từ tháng
-              // console.log(
-              //   "🎯 Hạn thẻ mới (tuthang):",
-              //   this.items[index].tuthang
-              // );
-
-              this.items[index].muctiendong = data.mucDong;
-              // this.items[index].maphuongthucdong = data.phuongthuc;
-              // set phương thức đóng
-              // ở đây có thể là 1,3,6,12, VS
-
-              // this.items[index].tungay = formatDate(tuNgay);
+              this.items[index].tungay = formatDate(tuNgay);
               // console.log("🎯 Hạn thẻ từ (tungay):", this.items[index].tungay);
 
               this.items[index].matinh = data.maTinhLh;
               // đi tìm tên tỉnh
               const res_tinh = await this.$axios.get(
-                `/api/nguoihuong/find-tentinh?matinh=${resHGD.data.data[0].maTinhLh}`
+                `/api/nguoihuong/find-tentinh?matinh=${data.maTinhLh}`
               );
               if (res_tinh.data.length > 0) {
                 this.items[index].tentinh = res_tinh.data[0].tentinh;
                 // console.log(this.items[index].tentinh);
               }
-              this.items[index].maquanhuyen = resHGD.data.data[0].maHuyenLh;
+              this.items[index].maquanhuyen = data.maHuyenLh;
               // đi tìm tên quận huyện
               const res_huyen = await this.$axios.get(
-                `/api/nguoihuong/find-tenhuyen?matinh=${resHGD.data.data[0].maTinhLh}&maquanhuyen=${resHGD.data.data[0].maHuyenLh}`
+                `/api/nguoihuong/find-tenhuyen?matinh=${data.maTinhLh}&maquanhuyen=${data.maHuyenLh}`
               );
               if (res_huyen.data.length > 0) {
                 this.items[index].tenquanhuyen = res_huyen.data[0].tenquanhuyen;
                 // console.log(this.items[index].tenquanhuyen);
               }
-              this.items[index].maxaphuong = resHGD.data.data[0].maXaLh;
+              this.items[index].maxaphuong = data.maXaLh;
               // đi tìm tên xã
               const res_xa = await this.$axios.get(
-                `/api/nguoihuong/find-tenxa?matinh=${resHGD.data.data[0].maTinhLh}&maquanhuyen=${resHGD.data.data[0].maHuyenLh}&maxaphuong=${resHGD.data.data[0].maXaLh}`
+                `/api/nguoihuong/find-tenxa?matinh=${data.maTinhLh}&maquanhuyen=${data.maHuyenLh}&maxaphuong=${data.maXaLh}`
               );
               // console.log(res_xa);
 
@@ -2004,8 +1992,8 @@ export default {
                 this.items[index].tenxaphuong = res_xa.data[0].tenxaphuong;
                 // console.log(this.items[index].tenxaphuong);
               }
-              this.items[index].tothon = resHGD.data.data[0].diaChiLh;
-              this.items[index].benhvientinh = resHGD.data.data[0].maTinh;
+              this.items[index].tothon = data.diaChi;
+              this.items[index].benhvientinh = data.maTinhLh;
               // this.items[index].mabenhvien = data.NoiKhamChuaBenh;
               // đi tìm tên bệnh viện kcb
               // const maBv = `${this.matinh}${data.NoiKhamChuaBenh}`;
@@ -2043,15 +2031,156 @@ export default {
       }
     },
 
+    async findNguoihuong_cccd(cccd, index) {
+      if (cccd !== "") {
+        const isDuplicate = this.items.some(
+          (item, idx) =>
+            idx !== index &&
+            (item.cccd === cccd || item.cccd === this.items[index].cccd)
+        );
+
+        if (isDuplicate) {
+          Swal.fire({
+            text: `Mã số ${cccd} vừa được đăng ký trong loại hình này xong, vui lòng kiểm tra lại!`,
+            icon: "error",
+          });
+
+          // Xoá mã số BHXH vừa nhập
+          this.items[index].cccd = "";
+          return;
+        }
+
+        try {
+          const res = await this.$axios.get(
+            `/api/nguoihuong/find-nguoihuong-cccd-theodstg?soCmnd=${cccd}`
+          );
+          this.isLoading = true;
+          // console.log(res.data);
+          if (res.data.length > 0) {
+            const resThe = await this.$axios.get(
+              `/api/nguoihuong/find-nguoihuong-masobhxh-theodstg-timhanthe?soSoBhxh=${masobhxh}`
+            );
+            this.isLoading = false;
+            const Toast = Swal.mixin({
+              toast: true,
+              position: "top-end",
+              showConfirmButton: false,
+              timer: 3000,
+              timerProgressBar: true,
+              didOpen: (toast) => {
+                toast.addEventListener("mouseenter", Swal.stopTimer);
+                toast.addEventListener("mouseleave", Swal.resumeTimer);
+              },
+            });
+            Toast.fire({
+              icon: "success",
+              title:
+                "Dữ liệu chỉ mang tính chất tham khảo. Xem và sửa nếu cần thiết !",
+            });
+            const data = res.data[0];
+            const datahanthe = resThe.data[0];
+            try {
+              this.items[index].hoten = data.hoTen;
+              this.items[index].ngaysinh = data.ngaySinh;
+              this.items[index].gioitinh = data.gioiTinh;
+              this.items[index].cccd = data.soCmnd;
+              this.items[index].dienthoai = data.soDienThoai;
+              this.items[index].tungay = datahanthe.denNgay;
+              this.items[index].matinh = data.maTinh;
+              // đi tìm tên tỉnh
+              const res_tinh = await this.$axios.get(
+                `/api/nguoihuong/find-tentinh?matinh=${data.maTinh}`
+              );
+              if (res_tinh.data.length > 0) {
+                this.items[index].tentinh = res_tinh.data[0].tentinh;
+              }
+              this.items[index].maquanhuyen = data.maHuyenLh;
+              // đi tìm tên quận huyện
+              const res_huyen = await this.$axios.get(
+                `/api/nguoihuong/find-tenhuyen?matinh=${data.maTinh}&maquanhuyen=${data.maHuyenLh}`
+              );
+              if (res_huyen.data.length > 0) {
+                this.items[index].tenquanhuyen = res_huyen.data[0].tenquanhuyen;
+              }
+              this.items[index].maxaphuong = data.maXaLh;
+              // đi tìm tên xã
+              const res_xa = await this.$axios.get(
+                `/api/nguoihuong/find-tenxa?matinh=${data.maTinh}&maquanhuyen=${data.maHuyenLh}&maxaphuong=${data.maXaLh}`
+              );
+              if (res_xa.data.length > 0) {
+                this.items[index].tenxaphuong = res_xa.data[0].tenxaphuong;
+              }
+              this.items[index].tothon = data.diaChiLh;
+              this.items[index].benhvientinh = data.maTinh;
+              // this.items[index].mabenhvien = data.NoiKhamChuaBenh;
+              // đi tìm tên bệnh viện kcb
+              // const maBv = `${this.matinh}${data.NoiKhamChuaBenh}`;
+              // const res_bv = await this.$axios.get(
+              //   `/api/nguoihuong/find-benhvien?mabenhvien=${maBv}`
+              // );
+              // if (res_bv.data.length > 0) {
+              //   this.items[index].tenbenhvien = res_bv.data[0].tenbenhvien;
+              // }
+            } catch (error) {
+              console.log(error.message);
+            }
+          } else {
+            this.isLoading = false;
+            const Toast = Swal.mixin({
+              toast: true,
+              position: "top-end",
+              showConfirmButton: false,
+              timer: 3000,
+              timerProgressBar: true,
+              didOpen: (toast) => {
+                toast.addEventListener("mouseenter", Swal.stopTimer);
+                toast.addEventListener("mouseleave", Swal.resumeTimer);
+              },
+            });
+            Toast.fire({
+              icon: "error",
+              title: "Không tìm thấy dữ liệu trong kho người hưởng",
+            });
+            return;
+          }
+        } catch (error) {
+          console.log(error);
+        }
+      }
+    },
+
+    async checkItem() {
+      const isDataValid = await this.checkFormData();
+      if (!isDataValid) {
+        // Dừng quá trình lưu dữ liệu nếu dữ liệu không hợp lệ
+        return;
+      } else {
+        const Toast = Swal.mixin({
+          toast: true,
+          position: "top-end",
+          showConfirmButton: false,
+          timer: 3000,
+          timerProgressBar: true,
+          didOpen: (toast) => {
+            toast.addEventListener("mouseenter", Swal.stopTimer);
+            toast.addEventListener("mouseleave", Swal.resumeTimer);
+          },
+        });
+        Toast.fire({
+          icon: "success",
+          title: `Bản ghi đã đầy đủ dữ liệu!`,
+        });
+      }
+    },
+
     addHosokekhai() {
-      (this.selectedOptionHtnt = "- Chọn hình thức nạp tiền -"),
-        (this.selectedOptionpa = "- Chọn phương án -"),
-        (this.selectedOptionptd = "- Chọn phương thức đóng -"),
-        (this.selectedOptionDoituongdong = "- Chọn đối tượng đóng -"),
-        (this.selectedOptionptdDongbu = "- Chọn phương thức đóng -"),
-        (this.addedIndex = 0); // là chỉ mục index của item hiện tại đang được nhập tại modal
+      this.addedIndex = 0; // là chỉ mục index của item hiện tại đang được nhập tại modal
       // Mở trạng thái nhập hồ sơ
-      this.isActive_nhaphoso = true;
+      this.selectedOption = "- Chọn phương án -";
+      this.selectedOptionBenhvien = "- Chọn cơ sở khám chữa bệnh -";
+      this.selectedOptionptd = "- Chọn phương thức đóng -";
+      (this.selectedOptionHtnt = "- Chọn hình thức nạp tiền -"),
+        (this.isActive_nhaphoso = true);
       // Số lượng phần tử trước khi thêm
       const previousLength = this.items.length;
       // Thêm dòng mới vào mảng
@@ -2071,6 +2200,18 @@ export default {
       // console.log(this.datanhaphosomodal);
     },
 
+    // ghi thông tin bệnh viện vào.
+    // onBenhVienSelected(selected, index) {
+    //   console.log("Selected:", selected);
+    //   console.log("Index:", index);
+
+    //   if (selected) {
+    //     this.items[index].mabenhvien = selected.mabenhvien;
+    //     this.items[index].tenbenhvien = selected.tenbenhvien;
+    //     this.items[index].benhvienInfo = selected; // Nếu cần lưu thêm info
+    //   }
+    // },
+
     async xacnhanGhihoso() {
       const result = await Swal.fire({
         title: `Xác nhận thêm vào bộ hồ sơ kê khai ?`,
@@ -2086,12 +2227,11 @@ export default {
           ngaysinh: "Ngày sinh",
           cccd: "Căn cước công dân",
           maphuongan: "Phương án",
-          muctiendong: "Mức tiền phải đóng",
-          tuthang: "Từ tháng",
-          madoituong: "Đối tượng đóng",
+          tungay: "Từ ngày",
           tenphuongthucdong: "Phương thức đóng",
           hinhthucnap: "Hình thức nạp",
           tentinh: "Tỉnh",
+          mabenhvien: "Bệnh viện",
         };
 
         const fieldsToValidate = [
@@ -2100,18 +2240,18 @@ export default {
           "ngaysinh",
           "cccd",
           "maphuongan",
-          "muctiendong",
-          "tuthang",
-          "madoituong",
+          "tungay",
           "tenphuongthucdong",
           "hinhthucnap",
           "tentinh",
+          "mabenhvien",
         ];
 
         for (const key of fieldsToValidate) {
-          const value = this.datanhaphosomodal[key];
-
-          if (!value || value === "") {
+          if (
+            !this.datanhaphosomodal[key] ||
+            this.datanhaphosomodal[key] === ""
+          ) {
             const fieldName = fieldNames[key] || key;
             const Toast = Swal.mixin({
               toast: true,
@@ -2130,33 +2270,13 @@ export default {
             });
             return;
           }
-
-          // ✅ Thêm kiểm tra riêng cho muctiendong
-          if (key === "muctiendong" && (value === "0" || value === 0)) {
-            const Toast = Swal.mixin({
-              toast: true,
-              position: "top-end",
-              showConfirmButton: false,
-              timer: 3000,
-              timerProgressBar: true,
-              didOpen: (toast) => {
-                toast.addEventListener("mouseenter", Swal.stopTimer);
-                toast.addEventListener("mouseleave", Swal.resumeTimer);
-              },
-            });
-            Toast.fire({
-              icon: "error",
-              title: `Vui lòng nhập vào mức thu nhập hàng tháng đóng!`,
-            });
-            return;
-          }
         }
 
         this.items[this.addedIndex] = this.datanhaphosomodal;
         this.datanhaphosomodal = {};
         this.isActive_nhaphoso = false;
-
         // console.log(this.items);
+        // console.log(this.benhvienInfo.mabenhvien);
       }
     },
 
@@ -2173,106 +2293,7 @@ export default {
       }
     },
 
-    async onSave() {
-      // đoạn này theo code mới là sẽ bấm để lưu dữ liệu biên lai
-      // Kiểm tra dữ liệu trước khi ghi
-      // console.log(this.dulieuTravedeinbienlai);
-      const isDataValid = await this.checkFormData();
-      if (!isDataValid) {
-        // Dừng quá trình lưu dữ liệu nếu dữ liệu không hợp lệ
-        return;
-      }
-
-      const result = await Swal.fire({
-        title: `Xác nhận biên lai điện tử?`,
-        showDenyButton: true,
-        confirmButtonText: "Xác nhận",
-        denyButtonText: `Hủy gửi`,
-      });
-      if (result.isConfirmed) {
-        // console.log(this.items);
-
-        // const current = new Date();
-        const nowInVietnam = DateTime.now().setZone("Asia/Ho_Chi_Minh");
-        const formattedDate = nowInVietnam.toFormat("dd-MM-yyyy HH:mm:ss");
-        try {
-          // Bắt đầu hiển thị biểu tượng loading
-          this.isLoading = true;
-          // thông tin biên lai
-          const currentYear = new Date().getFullYear();
-
-          // lấy tên biên lai để lưu
-          for (let i = 0; i < this.dulieuTravedeinbienlai.length; i++) {
-            const item = this.dulieuTravedeinbienlai[i];
-
-            const formattedForFilename = formattedDate.replace(/[-: ]/g, "_");
-            const urlNameInvoice = `${item.hosoIdentity}_${formattedForFilename}_${item.sobienlai}_${item.hoten}`;
-
-            const dataPost = {
-              hosoIdentity: item.hosoIdentity,
-              maSoBhxh: item.masobhxh,
-              hoTen: item.hoten,
-              soCccd: item.cccd,
-              ngaySinh: item.ngaysinh,
-              gioiTinh: item.gioitinh,
-              soDienThoai: item.dienthoai,
-              nguoithutien: item.tennguoitao,
-              loaiDt: item.tenloaihinh,
-              soTien: item.sotien,
-              soThang: item.maphuongthucdong,
-              tuNgay: item.tungay,
-              denNgay: item.denngay,
-              tuThang: item.tuthang,
-              denThang: item.denthang,
-              maDaiLy: item.madaily,
-              tenDaiLy: item.tendaily,
-              createdBy: this.user.username,
-              sobienlai: item.sobienlai,
-              ngaybienlai: formattedDate,
-              maloaihinh: item.maloaihinh,
-              tothon: item.tothon,
-              tenquanhuyen: item.tenquanhuyen,
-              tentinh: item.tentinh,
-              currentYear: currentYear,
-              urlNameInvoice: urlNameInvoice,
-            };
-
-            const ghibienlai = await this.$axios.post(
-              `/api/kekhai/ghidulieubienlai`,
-              dataPost
-            );
-
-            // lưu biên lai vào máy chủ
-            await this.inBienLaiDientu(dataPost);
-            // console.log("xongbienlai");
-          }
-
-          const hosoIds = this.dulieuTravedeinbienlai.map(
-            (item) => item.hosoIdentity
-          );
-
-          const rsIdtity = await this.$axios.post(
-            `/api/kekhai/getdskekhaiwithhsidentity`,
-            hosoIds
-          );
-          this.dulieuTravedeinbienlai = rsIdtity.data;
-          this.isLoading = false;
-          this.lockButtonXacnhaninbldt = true; // khoá nút xác nhận biên lai điện tử
-
-          Swal.fire({
-            title: "Hoàn tất xác nhận toàn bộ hồ sơ!",
-            icon: "success",
-          });
-          // console.log("check hàm xem biên lai:", this.xemBienLai);
-        } catch (error) {
-          // console.log(error);
-          this.isLoading = false;
-        }
-      }
-    },
-
     async guiKekhai() {
-      // console.log(this.items[0].tuthang);
       // trên data tạo ra 1 mảng dữ liệu để lưu thông tin sau gọi in biên lai
       this.dulieuInbienlai = [];
       if (this.items.length > 0) {
@@ -2318,26 +2339,20 @@ export default {
             // Bắt đầu hiển thị biểu tượng loading
             this.isLoading = true;
             let dataKekhai = [];
-            // console.log("test1");
-
             try {
               for (let i = 0; i < this.items.length; i++) {
                 this.items[i].sotien = this.items[i].sotien.replace(/,/g, "");
-
-                this.items[i].muctiendong = this.items[i].muctiendong.replace(
+                this.items[i].tienluongcs = this.items[i].tienluongcs.replace(
                   /,/g,
                   ""
                 );
 
-                this.items[i].denthang = this.tinhDenThang(
-                  this.items[i].tuthang,
+                this.items[i].denngay = this.calculateEndDate(
+                  this.items[i].tungay,
                   this.items[i].maphuongthucdong
                 );
 
-                // console.log(this.items[i].denthang);
-
                 this.items[i].tennguoitao = this.user.name;
-
                 // ngày biên lai
                 // const ngaybienlaiTranform = this.convertDate(
                 //   this.items[i].ngaybienlai
@@ -2349,6 +2364,23 @@ export default {
                 this.items[i].createdBy = this.user.username;
                 this.items[i].updatedAt = "";
                 this.items[i].updatedBy = "";
+
+                // thông tin bộ hồ sơ nạp
+                this.items[i].nvt_masobhxh = this.user.masobhxh;
+                this.items[i].nvt_cccd = this.user.cccd;
+                this.items[i].kykekhai = kyKeKhaiFrm;
+                this.items[i].ngaykekhai = formattedDate;
+                this.items[i].ngaybienlai = formattedDate;
+
+                // đánh dấu hồ sơ đã nạp luôn
+                this.items[i].trangthai = 0;
+
+                const uniqueString = this.generateUniqueString();
+                this.items[i].hosoIdentity =
+                  uniqueString +
+                  this.items[i].masobhxh +
+                  this.items[i].cccd +
+                  this.user.username;
 
                 // **** thêm các thông tin để gửi dữ liệu lên cổng tiếp nhận BHXH VN
                 // số tiền, số tháng kiểu float và kiểu int cho từng loại
@@ -2364,29 +2396,20 @@ export default {
                 // AR0212M	Tổ chức dịch vụ thu BHYT HGĐ có MSTB - Công ty TNHH An Sinh 159
                 // IS0212M	Tổ chức dịch vụ thu BHXH TN - Công ty TNHH An Sinh 159
 
-                let maToChucDvt = "IS0212M";
+                let maToChucDvt = "AR0212M";
                 let soTien = this.items[i].sotien;
                 let soThang = this.items[i].maphuongthucdong;
-                let maNhanVienThu = "NVT" + this.user.cccd;
+                let maNhanVienThu = "NVT" + this.items[i].nvt_cccd;
                 let tenNhanVienThu = this.user.name;
                 let maCqBhxh = this.user.macqbhxh;
                 let tenCqBhxh = this.user.tencqbhxh;
                 let key = "0123"; // do bhxh vn cung cấp
-                let tuNgay = this.items[i].tuthang;
-                let denNgay = this.tinhDenThang(tuNgay, soThang);
+                let tuNgay = this.items[i].tungay;
+                let denNgay = this.calculateEndDate(tuNgay, soThang);
 
-                // thông tin bộ hồ sơ nạp
-                this.items[i].nvt_masobhxh = this.user.masobhxh;
-                this.items[i].nvt_cccd = this.user.cccd;
-                this.items[i].kykekhai = kyKeKhaiFrm;
-                this.items[i].ngaykekhai = formattedDate;
+                // thông tin biên lai
+                const currentYear = new Date().getFullYear();
 
-                const uniqueString = this.generateUniqueString();
-                this.items[i].hosoIdentity =
-                  uniqueString +
-                  this.items[i].masobhxh +
-                  this.items[i].cccd +
-                  this.user.username;
                 // Loại bỏ dữ liệu không cần thiết bằng destructuring
                 const {
                   info_benhvien,
@@ -2411,6 +2434,7 @@ export default {
                   key,
                   tuNgay,
                   denNgay,
+                  currentYear, // thêm năm hiện tại vào
                 };
 
                 // Thêm cả filteredItem và additionalData vào mảng dataKekhai
@@ -2419,17 +2443,18 @@ export default {
                   ...additionalData,
                 });
 
-                // thông tin biên lai
-                const currentYear = new Date().getFullYear();
+                const tiendong = parseInt(
+                  this.items[i].sotien.replace(/,/g, ""),
+                  10
+                );
 
                 // lấy tên biên lai để lưu
                 const formattedForFilename = formattedDate.replace(
                   /[-: ]/g,
                   "_"
                 );
-                // console.log(formattedForFilename);
-
                 const urlNameInvoice = `${this.items[i].hosoIdentity}_${formattedForFilename}_${this.items[i].hoten}`;
+
                 // console.log(urlNameInvoice);
 
                 const dataPost = {
@@ -2442,7 +2467,7 @@ export default {
                   soDienThoai: this.items[i].dienthoai,
                   nguoithutien: this.items[i].tennguoitao,
                   loaiDt: this.items[i].tenloaihinh,
-                  soTien: this.items[i].sotien,
+                  soTien: tiendong,
                   soThang: this.items[i].maphuongthucdong,
                   tuNgay: this.items[i].tungay,
                   denNgay: this.items[i].denngay,
@@ -2514,51 +2539,7 @@ export default {
       }
     },
 
-    async xemBienLai(item) {
-      // console.log(item.hosoIdentity);
-
-      try {
-        const res = await this.$axios.get(
-          `/api/kekhai/view-item-bienlai?hosoIdentity=${item.hosoIdentity}`
-        );
-
-        // console.log(res);
-
-        const hs = res.data.hs;
-        if (hs && hs.urlNameInvoice) {
-          const fileName = `${hs.sobienlai}_${encodeURIComponent(
-            hs.hoten
-          )}.pdf`;
-          const pdfUrl = `http://14.224.129.177:1970/bienlaidientu/${hs.urlNameInvoice}.pdf`;
-          // const pdfUrl = `http://localhost:1970/bienlaidientu/${hs.urlNameInvoice}.pdf`;
-          // console.log(pdfUrl);
-
-          window.open(pdfUrl, "_blank");
-        } else {
-          console.warn("Thiếu thông tin số biên lai hoặc họ tên!");
-          this.$swal.fire({
-            icon: "error",
-            title: "Lỗi",
-            text: "Không lấy được thông tin biên lai.",
-          });
-        }
-      } catch (error) {
-        console.error("Lỗi khi gọi API:", error);
-        this.$swal.fire({
-          icon: "error",
-          title: "Lỗi",
-          text: "Không thể kết nối đến máy chủ.",
-        });
-      }
-    },
-
     addRow() {
-      const now = new Date();
-      const currentMonthYear = `${String(now.getMonth() + 1).padStart(
-        2,
-        "0"
-      )}/${now.getFullYear()}`;
-
       try {
         this.items.push({
           matochuc: this.user.matochuc,
@@ -2580,8 +2561,8 @@ export default {
           maphuongan: "",
           tenphuongan: "",
           tienluongcs: this.luongcoso,
-          tylengansachtw: this.tylengansachtw,
-          tylenngansachdp: this.tylenngansachdp,
+          tylensnnht: this.tylengansachtw,
+          tylensdp: this.tylenngansachdp,
           hotrokhac: this.hotrokhac,
           tungay: "",
           denngay: "",
@@ -2605,11 +2586,10 @@ export default {
           tenbenhvien: "",
           ghichu: "",
           // phải kê vào để lưu CSDL những cái này không có trong loại hình này
-          muchuongbhyt: "",
-          doituong: this.doituongdong,
           madoituong: "",
           tendoituong: "",
-          tuthang: currentMonthYear, // kiểu string
+          tuthang: "",
+          denthang: "",
           nguoithu: "",
           manguoithu: 0,
           tylengansachdiaphuong: 0,
@@ -2617,11 +2597,8 @@ export default {
           muctiendong: 0,
           tientunguyendong: 0,
           tienlai: 0,
-          tylensnnht: 0,
           tiennsnnht: 0,
-          tylensdp: 0,
           tiennsdp: 0,
-          sothang: 0, // code ngày 29/4/2025 đợt sửa IS sau khi đi vinh về. cái này là số tháng mà người ta đóng bù
 
           // hồ sơ kê khai
           dotkekhai: "",
@@ -2636,7 +2613,7 @@ export default {
           hinhthucnap: 1,
         });
 
-        // console.log(this.items);
+        // console.log(this.items)
       } catch (error) {
         console.log(error);
       }
@@ -2690,723 +2667,47 @@ export default {
       }
     },
 
-    hoanTatDongHs() {
-      // console.log("hoantatdong");
-      this.items = [];
-      this.dulieuTravedeinbienlai = [];
-      this.dulieuInbienlai = [];
-      this.isActive_xacnhan = false;
-    },
-
-    limitTiendong(cast, index) {
-      let castInput = cast.toString().replace(/,/g, "");
-      const minInput = this.chuanngheo;
-      const maxInput = this.luongcoso * 20;
-      if (castInput < minInput) {
-        const Toast = Swal.mixin({
-          toast: true,
-          position: "top",
-          showConfirmButton: false,
-          timer: 3000,
-          timerProgressBar: true,
-          didOpen: (toast) => {
-            toast.addEventListener("mouseenter", Swal.stopTimer);
-            toast.addEventListener("mouseleave", Swal.resumeTimer);
-          },
-        });
-        Toast.fire({
-          icon: "error",
-          title: `Số tiền đóng không được thấp hơn chuẩn nghèo: ${this.formatCurrency(
-            minInput
-          )}`,
-        });
-        return;
-      }
-      if (castInput > maxInput) {
-        const Toast = Swal.mixin({
-          toast: true,
-          position: "top",
-          showConfirmButton: false,
-          timer: 3000,
-          timerProgressBar: true,
-          didOpen: (toast) => {
-            toast.addEventListener("mouseenter", Swal.stopTimer);
-            toast.addEventListener("mouseleave", Swal.resumeTimer);
-          },
-        });
-        Toast.fire({
-          icon: "error",
-          title: `Số tiền đóng không được vượt quá 20 lần lương cơ sở: ${this.formatCurrency(
-            maxInput
-          )}`,
-        });
-        return;
-      }
-      // Kiểm tra xem số tiền có phải là bội số của 50,000 sau 1,500,000 không
-      if ((castInput - minInput) % 50000 !== 0) {
-        const Toast = Swal.mixin({
-          toast: true,
-          position: "top",
-          showConfirmButton: false,
-          timer: 3000,
-          timerProgressBar: true,
-          didOpen: (toast) => {
-            toast.addEventListener("mouseenter", Swal.stopTimer);
-            toast.addEventListener("mouseleave", Swal.resumeTimer);
-          },
-        });
-        Toast.fire({
-          icon: "error",
-          title: `Số tiền đóng phải là bội số của 50.000 đ`,
-        });
-        return;
-      }
-
-      const mucDong = parseFloat(
-        this.items[index].muctiendong.replace(/,/g, "")
-      );
-
-      let castMucdong = mucDong * (this.tyledongbhyt / 100);
-      let castSubTwhotro = this.chuanngheo * (this.tyledongbhyt / 100);
-      let castDiaphuonght =
-        this.chuanngheo *
-        (this.tyledongbhyt / 100) *
-        (this.tylediaphuonghotroIs / 100);
-      let castDiaphuonghtKhac =
-        this.chuanngheo *
-        (this.tyledongbhyt / 100) *
-        (this.tylehotrokhacIs / 100);
-
-      if (this.items[index].madoituong === "BT") {
-        let madoituong = "";
-        for (let i = 0; i < this.doituongdong.length; i++) {
-          const doituong = this.doituongdong[i];
-          // CHÚNG TA TÌM TỶ LỆ HỖ TRỢ TƯƠNG ỨNG TẠI ĐÂY
-          if (doituong.madoituong === "BT") {
-            madoituong = doituong.tylehotro;
-          }
-        }
-
-        // Bắt đầu tính tiền
-        castSubTwhotro = castSubTwhotro * (madoituong / 100);
-        let tienPhaidong =
-          (castMucdong -
-            castSubTwhotro -
-            castDiaphuonght -
-            castDiaphuonghtKhac) *
-          parseFloat(this.items[index].maphuongthucdong);
-        this.items[index].sotien = tienPhaidong;
-        // console.log(this.items[index].sotien);
-      } else if (this.items[index].madoituong === "CN") {
-        let madoituong = "";
-        for (let i = 0; i < this.doituongdong.length; i++) {
-          const doituong = this.doituongdong[i];
-          // CHÚNG TA TÌM TỶ LỆ HỖ TRỢ TƯƠNG ỨNG TẠI ĐÂY
-          if (doituong.madoituong === "CN") {
-            madoituong = doituong.tylehotro;
-          }
-        }
-
-        // Bắt đầu tính tiền
-        castSubTwhotro = castSubTwhotro * (madoituong / 100);
-        let tienPhaidong =
-          (castMucdong -
-            castSubTwhotro -
-            castDiaphuonght -
-            castDiaphuonghtKhac) *
-          parseFloat(this.items[index].maphuongthucdong);
-        this.items[index].sotien = tienPhaidong;
-      } else if (this.items[index].madoituong === "N") {
-        let madoituong = "";
-        for (let i = 0; i < this.doituongdong.length; i++) {
-          const doituong = this.doituongdong[i];
-          // CHÚNG TA TÌM TỶ LỆ HỖ TRỢ TƯƠNG ỨNG TẠI ĐÂY
-          if (doituong.madoituong === "N") {
-            madoituong = doituong.tylehotro;
-          }
-        }
-
-        // Bắt đầu tính tiền
-        castSubTwhotro = castSubTwhotro * (madoituong / 100);
-        let tienPhaidong =
-          (castMucdong -
-            castSubTwhotro -
-            castDiaphuonght -
-            castDiaphuonghtKhac) *
-          parseFloat(this.items[index].maphuongthucdong);
-        this.items[index].sotien = tienPhaidong;
-      } else if (this.items[index].madoituong === "NT") {
-        let madoituong = "";
-        for (let i = 0; i < this.doituongdong.length; i++) {
-          const doituong = this.doituongdong[i];
-          // CHÚNG TA TÌM TỶ LỆ HỖ TRỢ TƯƠNG ỨNG TẠI ĐÂY
-          if (doituong.madoituong === "NT") {
-            madoituong = doituong.tylehotro;
-          }
-        }
-
-        // Bắt đầu tính tiền
-        castSubTwhotro = castSubTwhotro * (madoituong / 100);
-        let tienPhaidong =
-          (castMucdong - castSubTwhotro - castDiaphuonghtKhac) *
-          parseFloat(this.items[index].maphuongthucdong);
-        this.items[index].sotien = tienPhaidong;
-      }
-    },
-
-    tinhTienPhaiDong(madoituong, muctiendong, maphuongthucdong, tuthang) {
-      // console.log("Từ tháng đã nhập vào:", tuthang);
-      const denthang = this.tinhDenThang(tuthang, maphuongthucdong);
-      // console.log("Đến tháng:", denthang);
-
-      // Parse tháng/năm bắt đầu và kết thúc
-      const [startMonth, startYear] = tuthang.split("/").map(Number);
-      const [endMonth, endYear] = denthang.split("/").map(Number);
-
-      let thangTrong2025 = 0;
-      let thangNgoai2025 = 0;
-
-      let month = startMonth;
-      let year = startYear;
-
-      while (year < endYear || (year === endYear && month <= endMonth)) {
-        if (year === 2025) {
-          thangTrong2025++;
-        } else {
-          thangNgoai2025++;
-        }
-
-        month++;
-        if (month > 12) {
-          month = 1;
-          year++;
-        }
-      }
-
-      // console.log(`Số tháng trong năm 2025: ${thangTrong2025}`);
-      // console.log(`Số tháng ngoài năm 2025: ${thangNgoai2025}`);
-
-      // Tính tiền
-      const tyleDong = this.tyledongbhyt / 100;
-      const castMucdong = muctiendong * tyleDong;
-      const castSubTwhotro = this.chuanngheo * tyleDong;
-
-      // Tìm tỷ lệ hỗ trợ trung ương theo mã đối tượng
-      // cho vào danh mục tỷ lệ đóng của IL là 30 45 50
-      const doituong = this.doituongdongil.find(
-        (d) => d.madoituong === madoituong
-      );
-      const tyleHotroTW = doituong ? doituong.tylehotro : 0;
-      const hotroTW = castSubTwhotro * (tyleHotroTW / 100);
-
-      let tienCanNap = 0;
-
-      // const castDiaphuonght =
-      //   this.chuanngheo * tyleDong * (this.tylediaphuonghotroIs / 100);
-      // const castDiaphuonghtKhac =
-      //   this.chuanngheo * tyleDong * (this.tylehotrokhacIs / 100);
-
-      tienCanNap = (castMucdong - hotroTW) * parseFloat(maphuongthucdong);
-
-      // console.log("Tiền cần nạp:", tienCanNap);
-      return tienCanNap;
-    },
-
-    async doituongChange(e, index) {
-      const madoituong = e.target.value;
-      const tendoituong = e.target.options[e.target.selectedIndex].text;
-      this.items[index].madoituong = madoituong;
-      this.items[index].tendoituong = tendoituong;
-
-      const maphuongthucdong = this.items[index].maphuongthucdong;
-      const tuthang = this.items[index].tuthang;
-
-      const muctiendong = parseFloat(
-        this.items[index].muctiendong.replace(/,/g, "")
-      );
-
-      this.items[index].sotien = this.tinhTienPhaiDong(
-        madoituong,
-        muctiendong,
-        maphuongthucdong,
-        tuthang
-      );
-    },
-
-    async doituongChange1(e, index) {
-      let tuthang, denthang, maphuongthucdong;
-      console.log("từ tháng đã nhập vào: ", this.items[index].tuthang);
-      tuthang = this.items[index].tuthang;
-      console.log(
-        "phương thức đóng đã nhập vào: ",
-        this.items[index].maphuongthucdong
-      );
-      maphuongthucdong = this.items[index].maphuongthucdong;
-      denthang = this.tinhDenThang(this.items[index].tuthang, maphuongthucdong);
-
-      console.log("đến tháng: ", denthang);
-
-      // Tính số tháng trong 2025 và 2026
-      const [startMonth, startYear] = tuthang.split("/").map(Number);
-      const [endMonth, endYear] = denthang.split("/").map(Number);
-
-      let thang2025 = 0;
-      let thang2026 = 0;
-
-      let month = startMonth;
-      let year = startYear;
-
-      while (year < endYear || (year === endYear && month <= endMonth)) {
-        if (year === 2025) {
-          thang2025++;
-        } else if (year === 2026) {
-          thang2026++;
-        }
-
-        month++;
-        if (month > 12) {
-          month = 1;
-          year++;
-        }
-      }
-
-      console.log(`Số tháng trong 2025: ${thang2025}`);
-      console.log(`Số tháng trong 2026: ${thang2026}`);
-
-      console.log(this.tylediaphuonghotroIs);
-
-      const madoituong = e.target.value;
-      const tendoituong = e.target.options[e.target.selectedIndex].text;
-      this.items[index].madoituong = madoituong;
-      this.items[index].tendoituong = tendoituong;
-
-      const mucDong = parseFloat(
-        this.items[index].muctiendong.replace(/,/g, "")
-      );
-
-      let castMucdong = mucDong * (this.tyledongbhyt / 100);
-
-      let castSubTwhotro = this.chuanngheo * (this.tyledongbhyt / 100);
-
-      let castDiaphuonght =
-        this.chuanngheo *
-        (this.tyledongbhyt / 100) *
-        (this.tylediaphuonghotroIs / 100);
-      console.log("tiền ngân sách địa phương hỗ trợ:", castDiaphuonght);
-
-      let castDiaphuonghtKhac =
-        this.chuanngheo *
-        (this.tyledongbhyt / 100) *
-        (this.tylehotrokhacIs / 100);
-
-      console.log("tiền ngân sách địa phương hỗ trợ khác:", castDiaphuonght);
-
-      if (this.items[index].madoituong === "BT") {
-        let madoituong = "";
-        for (let i = 0; i < this.doituongdong.length; i++) {
-          const doituong = this.doituongdong[i];
-          // CHÚNG TA TÌM TỶ LỆ HỖ TRỢ TƯƠNG ỨNG TẠI ĐÂY
-          if (doituong.madoituong === "BT") {
-            console.log(
-              "tỷ lệ hỗ trợ của trung ương của BT: ",
-              doituong.tylehotro
-            );
-
-            madoituong = doituong.tylehotro;
-          }
-        }
-
-        // Bắt đầu tính tiền
-        castSubTwhotro = castSubTwhotro * (madoituong / 100);
-        let tienPhaidong =
-          (castMucdong -
-            castSubTwhotro -
-            castDiaphuonght -
-            castDiaphuonghtKhac) *
-          parseFloat(this.items[index].maphuongthucdong);
-        this.items[index].sotien = tienPhaidong;
-        // console.log(this.items[index].sotien);
-      } else if (this.items[index].madoituong === "CN") {
-        let madoituong = "";
-        for (let i = 0; i < this.doituongdong.length; i++) {
-          const doituong = this.doituongdong[i];
-          // CHÚNG TA TÌM TỶ LỆ HỖ TRỢ TƯƠNG ỨNG TẠI ĐÂY
-          if (doituong.madoituong === "CN") {
-            console.log(
-              "tỷ lệ hỗ trợ của trung ương của CN: ",
-              doituong.tylehotro
-            );
-            madoituong = doituong.tylehotro;
-          }
-        }
-
-        // Bắt đầu tính tiền
-        castSubTwhotro = castSubTwhotro * (madoituong / 100);
-        let tienPhaidong =
-          (castMucdong -
-            castSubTwhotro -
-            castDiaphuonght -
-            castDiaphuonghtKhac) *
-          parseFloat(this.items[index].maphuongthucdong);
-        this.items[index].sotien = tienPhaidong;
-      } else if (this.items[index].madoituong === "N") {
-        let madoituong = "";
-        for (let i = 0; i < this.doituongdong.length; i++) {
-          const doituong = this.doituongdong[i];
-          // CHÚNG TA TÌM TỶ LỆ HỖ TRỢ TƯƠNG ỨNG TẠI ĐÂY
-          if (doituong.madoituong === "N") {
-            console.log(
-              "tỷ lệ hỗ trợ của trung ương của N: ",
-              doituong.tylehotro
-            );
-            madoituong = doituong.tylehotro;
-          }
-        }
-
-        // Bắt đầu tính tiền
-        castSubTwhotro = castSubTwhotro * (madoituong / 100);
-        let tienPhaidong =
-          (castMucdong -
-            castSubTwhotro -
-            castDiaphuonght -
-            castDiaphuonghtKhac) *
-          parseFloat(this.items[index].maphuongthucdong);
-        this.items[index].sotien = tienPhaidong;
-      } else if (this.items[index].madoituong === "NT") {
-        let madoituong = "";
-        for (let i = 0; i < this.doituongdong.length; i++) {
-          const doituong = this.doituongdong[i];
-          // CHÚNG TA TÌM TỶ LỆ HỖ TRỢ TƯƠNG ỨNG TẠI ĐÂY
-          if (doituong.madoituong === "NT") {
-            madoituong = doituong.tylehotro;
-          }
-        }
-
-        // Bắt đầu tính tiền
-        castSubTwhotro = castSubTwhotro * (madoituong / 100);
-        let tienPhaidong =
-          (castMucdong - castSubTwhotro - castDiaphuonghtKhac) *
-          parseFloat(this.items[index].maphuongthucdong);
-        this.items[index].sotien = tienPhaidong;
-      }
-    },
-
-    async doituongChangeDongbu(e, index) {
-      const madoituong = e.target.value;
-      const tendoituong = e.target.options[e.target.selectedIndex].text;
-      this.items[index].madoituong = madoituong;
-      this.items[index].tendoituong = tendoituong;
-
-      // const mucDong = parseFloat(
-      //   this.items[index].muctiendong.replace(/,/g, "")
-      // );
-
-      // let castMucdong = mucDong * (this.tyledongbhyt / 100);
-      // let castSubTwhotro = this.chuanngheo * (this.tyledongbhyt / 100);
-      // let castDiaphuonght =
-      //   this.chuanngheo *
-      //   (this.tyledongbhyt / 100) *
-      //   (this.tylediaphuonghotroIs / 100);
-      // let castDiaphuonghtKhac =
-      //   this.chuanngheo *
-      //   (this.tyledongbhyt / 100) *
-      //   (this.tylehotrokhacIs / 100);
-
-      // if (this.items[index].madoituong === "BT") {
-      //   let madoituong = "";
-      //   for (let i = 0; i < this.doituongdong.length; i++) {
-      //     const doituong = this.doituongdong[i];
-      //     // CHÚNG TA TÌM TỶ LỆ HỖ TRỢ TƯƠNG ỨNG TẠI ĐÂY
-      //     if (doituong.madoituong === "BT") {
-      //       madoituong = doituong.tylehotro;
-      //     }
-      //   }
-
-      //   // Bắt đầu tính tiền
-      //   castSubTwhotro = castSubTwhotro * (madoituong / 100);
-      //   let tienPhaidong =
-      //     (castMucdong -
-      //       castSubTwhotro -
-      //       castDiaphuonght -
-      //       castDiaphuonghtKhac) *
-      //     parseFloat(this.items[index].maphuongthucdong);
-      //   this.items[index].sotien = tienPhaidong;
-      //   // console.log(this.items[index].sotien);
-      // } else if (this.items[index].madoituong === "CN") {
-      //   let madoituong = "";
-      //   for (let i = 0; i < this.doituongdong.length; i++) {
-      //     const doituong = this.doituongdong[i];
-      //     // CHÚNG TA TÌM TỶ LỆ HỖ TRỢ TƯƠNG ỨNG TẠI ĐÂY
-      //     if (doituong.madoituong === "CN") {
-      //       madoituong = doituong.tylehotro;
-      //     }
-      //   }
-
-      //   // Bắt đầu tính tiền
-      //   castSubTwhotro = castSubTwhotro * (madoituong / 100);
-      //   let tienPhaidong =
-      //     (castMucdong -
-      //       castSubTwhotro -
-      //       castDiaphuonght -
-      //       castDiaphuonghtKhac) *
-      //     parseFloat(this.items[index].maphuongthucdong);
-      //   this.items[index].sotien = tienPhaidong;
-      // } else if (this.items[index].madoituong === "N") {
-      //   let madoituong = "";
-      //   for (let i = 0; i < this.doituongdong.length; i++) {
-      //     const doituong = this.doituongdong[i];
-      //     // CHÚNG TA TÌM TỶ LỆ HỖ TRỢ TƯƠNG ỨNG TẠI ĐÂY
-      //     if (doituong.madoituong === "N") {
-      //       madoituong = doituong.tylehotro;
-      //     }
-      //   }
-
-      //   // Bắt đầu tính tiền
-      //   castSubTwhotro = castSubTwhotro * (madoituong / 100);
-      //   let tienPhaidong =
-      //     (castMucdong -
-      //       castSubTwhotro -
-      //       castDiaphuonght -
-      //       castDiaphuonghtKhac) *
-      //     parseFloat(this.items[index].maphuongthucdong);
-      //   this.items[index].sotien = tienPhaidong;
-      // } else if (this.items[index].madoituong === "NT") {
-      //   let madoituong = "";
-      //   for (let i = 0; i < this.doituongdong.length; i++) {
-      //     const doituong = this.doituongdong[i];
-      //     // CHÚNG TA TÌM TỶ LỆ HỖ TRỢ TƯƠNG ỨNG TẠI ĐÂY
-      //     if (doituong.madoituong === "NT") {
-      //       madoituong = doituong.tylehotro;
-      //     }
-      //   }
-
-      //   // Bắt đầu tính tiền
-      //   castSubTwhotro = castSubTwhotro * (madoituong / 100);
-      //   let tienPhaidong =
-      //     (castMucdong - castSubTwhotro - castDiaphuonghtKhac) *
-      //     parseFloat(this.items[index].maphuongthucdong);
-      //   this.items[index].sotien = tienPhaidong;
-      // }
-    },
-
-    async phuongthucdChange(e, index) {
-      // console.log(this.items[index].madoituong);
-
-      const maphuongthucdong = e.target.value;
-      const tenphuongthucdong = e.target.options[e.target.selectedIndex].text;
-      this.items[index].maphuongthucdong = maphuongthucdong;
-      this.items[index].tenphuongthucdong = tenphuongthucdong;
-      this.items[index].sothang = 0;
-
-      const madoituong = this.items[index].madoituong;
-
-      const muctiendong = parseFloat(
-        this.items[index].muctiendong.replace(/,/g, "")
-      );
-
-      const tuthang = this.items[index].tuthang;
-
-      this.items[index].sotien = this.tinhTienPhaiDong(
-        madoituong,
-        muctiendong,
-        maphuongthucdong,
-        tuthang
-      );
+    // phương án
+    async phuonganChange(e, index) {
+      const maphuongan = e.target.value;
+      const tenphuongan = e.target.options[e.target.selectedIndex].text;
+      this.items[index].maphuongan = maphuongan;
+      this.items[index].tenphuongan = tenphuongan;
     },
 
     // phương thức đóng
-    async phuongthucdChange1(e, index) {
-      // console.log(e);
-      // console.log(index);
-
+    async phuongthucdChange(e, index) {
       const maphuongthucdong = e.target.value;
       const tenphuongthucdong = e.target.options[e.target.selectedIndex].text;
       this.items[index].maphuongthucdong = maphuongthucdong;
       this.items[index].tenphuongthucdong = tenphuongthucdong;
-      this.items[index].sothang = 0;
-
-      // console.log(maphuongthucdong);
-
-      if (maphuongthucdong == "D1LNCT" || maphuongthucdong == "D1LNVS") {
-        this.checkDong1lanchocacnamvesauVaConthieu = true;
-        if (maphuongthucdong == "D1LNCT") {
-          this.NCT = true;
-          this.NVS = false;
-        }
-        if (maphuongthucdong == "D1LNVS") {
-          this.NVS = true;
-          this.NCT = false;
-        }
-      } else {
-        this.checkDong1lanchocacnamvesauVaConthieu = false;
-      }
-
-      // console.log(`NCT: ${this.NCT}`);
-      // console.log(`NVS: ${this.NVS}`);
-
-      // console.log(this.checkDong1lanchocacnamvesauVaConthieu);
 
       // tính số tiền phải nạp
-      // console.log(this.items[index].muctiendong);
-      // console.log(typeof(this.items[index].muctiendong));
+      // console.log(typeof(this.luongcoso));
+      const cast =
+        this.luongcoso * 0.045 * parseInt(this.items[index].maphuongthucdong);
 
-      // ***  CÁC TỶ LỆ HỖ TRỢ ĐƯA VÀO DANH MỤC VÀ THAY ĐỔI THEO TỪNG ĐỊA PHƯƠNG
-      // 1. this.tyledongbhyt (tỷ lệ đóng 22% .. thay đổi thì vào danh mục)
-      // 2. this.chuanngeo (mức chuẩn nghèo do nhà nước quy định)
-      // 3. this.tylediaphuonghotroIs (tỷ lệ này do địa phương - do tỉnh - từng nơi qy định)
-      // 4. this.tylehotrokhacIs (các tỷ lệ khác đôi khi do từng huyện xin được hỗ trợ)
+      const twHotro =
+        this.luongcoso *
+        0.045 *
+        parseInt(this.items[index].maphuongthucdong) *
+        (this.tylengansachtw / 100);
 
-      // mức tiền đóng do lao động lựa chọn
-      // cái này phải yêu cầu chọn chẵn tiền ví dụ 1.050.000 hoặc 1.300.000 không được lẻ như 1.020.000
-      // khống chế < 20 lần lương cơ bản (<20*1.800.000)
-      const mucDong = parseFloat(
-        this.items[index].muctiendong.replace(/,/g, "")
-      );
-      // console.log(typeof mucDong);
-      // console.log(mucDong);
+      const dpHotro =
+        this.luongcoso *
+        0.045 *
+        parseInt(this.items[index].maphuongthucdong) *
+        (this.tylenngansachdp / 100);
 
-      // công thức tính cần đưa danh mục
-      // tỷ lệ đóng: 22%
-      // chuẩn hộ nghèo: 1500000
+      const hotroKhac =
+        this.luongcoso *
+        0.045 *
+        parseInt(this.items[index].maphuongthucdong) *
+        parseInt(this.items[index].hotrokhac);
 
-      // lương cơ sở là 1800000
-      // hạn chế không được nhập mức tiền đóng > luongcoso * 20 (lần)
-
-      // công thức tính đóng hàng tháng háng
-      // ((mức tiền lương chọn đóng * tỷ lệ đóng) -
-      // (chuẩn hộ nghèo * tỷ lệ đóng * 10% (NSTW hỗ trợ cho đối tượng BT))) * số tháng
-      // tách đối tượng đóng:
-
-      let castMucdong = mucDong * (this.tyledongbhyt / 100);
-      let castSubTwhotro = this.chuanngheo * (this.tyledongbhyt / 100);
-      let castDiaphuonght =
-        this.chuanngheo *
-        (this.tyledongbhyt / 100) *
-        (this.tylediaphuonghotroIs / 100);
-      let castDiaphuonghtKhac =
-        this.chuanngheo *
-        (this.tyledongbhyt / 100) *
-        (this.tylehotrokhacIs / 100);
-
-      // console.log(castDiaphuonght, castDiaphuonghtKhac);
-
-      // console.log(castMucdong);
-      // console.log(castSubTwhotro);
-      // console.log(castDiaphuonght);
-
-      // Bắt đầu tính tiền khi người dùng chọn số tháng nạp
-      // Ở đây với mỗi đối tượng đóng được chọn thì sẽ có công thức tính khác nhau
-      // console.log(this.items[index].madoituong);
-      // console.log(this.doituongdong);
-      if (this.items[index].madoituong === "BT") {
-        let madoituong = "";
-        for (let i = 0; i < this.doituongdong.length; i++) {
-          const doituong = this.doituongdong[i];
-          // CHÚNG TA TÌM TỶ LỆ HỖ TRỢ TƯƠNG ỨNG TẠI ĐÂY
-          if (doituong.madoituong === "BT") {
-            madoituong = doituong.tylehotro;
-          }
-        }
-
-        // Bắt đầu tính tiền
-        castSubTwhotro = castSubTwhotro * (madoituong / 100);
-        let tienPhaidong =
-          (castMucdong -
-            castSubTwhotro -
-            castDiaphuonght -
-            castDiaphuonghtKhac) *
-          parseFloat(this.items[index].maphuongthucdong);
-        this.items[index].sotien = tienPhaidong;
-        // console.log(this.items[index].sotien);
-      } else if (this.items[index].madoituong === "CN") {
-        let madoituong = "";
-        for (let i = 0; i < this.doituongdong.length; i++) {
-          const doituong = this.doituongdong[i];
-          // CHÚNG TA TÌM TỶ LỆ HỖ TRỢ TƯƠNG ỨNG TẠI ĐÂY
-          if (doituong.madoituong === "CN") {
-            madoituong = doituong.tylehotro;
-          }
-        }
-
-        // Bắt đầu tính tiền
-        castSubTwhotro = castSubTwhotro * (madoituong / 100);
-        let tienPhaidong =
-          (castMucdong -
-            castSubTwhotro -
-            castDiaphuonght -
-            castDiaphuonghtKhac) *
-          parseFloat(this.items[index].maphuongthucdong);
-        this.items[index].sotien = tienPhaidong;
-      } else if (this.items[index].madoituong === "N") {
-        let madoituong = "";
-        for (let i = 0; i < this.doituongdong.length; i++) {
-          const doituong = this.doituongdong[i];
-          // CHÚNG TA TÌM TỶ LỆ HỖ TRỢ TƯƠNG ỨNG TẠI ĐÂY
-          if (doituong.madoituong === "N") {
-            madoituong = doituong.tylehotro;
-          }
-        }
-
-        // Bắt đầu tính tiền
-        castSubTwhotro = castSubTwhotro * (madoituong / 100);
-        let tienPhaidong =
-          (castMucdong -
-            castSubTwhotro -
-            castDiaphuonght -
-            castDiaphuonghtKhac) *
-          parseFloat(this.items[index].maphuongthucdong);
-        this.items[index].sotien = tienPhaidong;
-      } else if (this.items[index].madoituong === "NT") {
-        let madoituong = "";
-        for (let i = 0; i < this.doituongdong.length; i++) {
-          const doituong = this.doituongdong[i];
-          // CHÚNG TA TÌM TỶ LỆ HỖ TRỢ TƯƠNG ỨNG TẠI ĐÂY
-          if (doituong.madoituong === "NT") {
-            madoituong = doituong.tylehotro;
-          }
-        }
-
-        // Bắt đầu tính tiền
-        castSubTwhotro = castSubTwhotro * (madoituong / 100);
-        let tienPhaidong =
-          (castMucdong - castSubTwhotro - castDiaphuonghtKhac) *
-          parseFloat(this.items[index].maphuongthucdong);
-        this.items[index].sotien = tienPhaidong;
-      }
-    },
-
-    // áp dụng cho đóng bù
-    async phuongthucdChangeDongbu(e, index) {
-      // console.log(e.target.options[e.target.selectedIndex].text);
-
-      const maphuongthucdong = e.target.value;
-      const tenphuongthucdong = e.target.options[e.target.selectedIndex].text;
-      // console.log(maphuongthucdong);
-      // console.log(tenphuongthucdong);
-
-      this.items[index].maphuongthucdong = maphuongthucdong;
-      this.items[index].tenphuongthucdong = tenphuongthucdong;
-      this.items[index].sothang = 0;
-
-      if (maphuongthucdong == "D1LNCT") {
-        this.NCT = true;
-        this.NVS = false;
-      }
-      if (maphuongthucdong == "D1LNVS") {
-        this.NVS = true;
-        this.NCT = false;
-      }
-    },
-
-    // phương án
-    async phuonganChange(e, index) {
-      // console.log(e.target.options[e.target.selectedIndex]);
-      const maphuongan = e.target.value;
-      const tenphuongan = e.target.options[e.target.selectedIndex].text;
-      // console.log(maphuongan);
-      // console.log(tenphuongan);
-      this.items[index].maphuongan = maphuongan;
-      this.items[index].tenphuongan = tenphuongan;
+      const sotienPhaidong = cast - (twHotro + dpHotro + hotroKhac);
+      this.items[index].sotien = sotienPhaidong;
+      // console.log(this.items[index]);
     },
 
     // tỉnh thành phố
@@ -3473,13 +2774,28 @@ export default {
     },
 
     // thông tin bệnh viện
-    async hopChange(event, index) {
-      const selectedOption = event.target.value;
-      let position = selectedOption.split("-");
-      if (position) {
-        this.items[index].mabenhvien = position[0].trim();
-        this.items[index].tenbenhvien = position[1].trim();
-      }
+    async hopChange(e, index) {
+      const mabenhvien = e.target.value;
+      const text = e.target.options[e.target.selectedIndex].text;
+
+      // Tách ra
+      const parts = text.split(" - ");
+      const tenbenhvien = parts[1] ? parts[1].trim() : "";
+
+      this.items[index].mabenhvien = mabenhvien;
+      this.items[index].tenbenhvien = tenbenhvien;
+      // console.log(this.items[index]);
+    },
+
+    async hopChangeReset(e, index) {
+      const mabenhvien = e.target.value;
+      const text = e.target.options[e.target.selectedIndex].text;
+      // console.log(mabenhvien);
+      // console.log(text);
+
+      this.items[index].mabenhvien = mabenhvien;
+      this.items[index].tenbenhvien = text;
+      // console.log(this.items[index]);
     },
 
     hinhthucNap(event, index) {
@@ -3487,40 +2803,7 @@ export default {
       // console.log(selectedOption);
       if (selectedOption) {
         this.items[index].hinhthucnap = selectedOption;
-      }
-    },
-
-    validateMonthYear(tuthang, index) {
-      // Nếu người dùng nhập 6 ký tự mà không có dấu gạch chéo, hãy chèn vào
-      if (/^\d{6}$/.test(tuthang)) {
-        // Chuyển đổi từ "MMYYYY" sang "MM/YYYY"
-        const formatted = `${tuthang.slice(0, 2)}/${tuthang.slice(2, 6)}`;
-        tuthang = formatted; // Cập nhật giá trị với định dạng đúng
-      }
-
-      const regex = /^(0[1-9]|1[0-2])\/\d{4}$/; // Định dạng MM/YYYY
-      if (!regex.test(tuthang)) {
-        this.items[index].tuthang = ""; // Xóa giá trị nếu không đúng định dạng
-        this.hoso.tuthang = ""; // Xóa giá trị nếu không đúng định dạng
-        const Toast = Swal.mixin({
-          toast: true,
-          position: "top",
-          showConfirmButton: false,
-          timer: 3000,
-          timerProgressBar: true,
-          didOpen: (toast) => {
-            toast.addEventListener("mouseenter", Swal.stopTimer);
-            toast.addEventListener("mouseleave", Swal.resumeTimer);
-          },
-        });
-        Toast.fire({
-          icon: "error",
-          title: `Nhập đúng định dạng MM/YYYY`,
-        });
-        return;
-      } else {
-        // Nếu định dạng đúng, cập nhật giá trị
-        this.items[index].tuthang = tuthang;
+        this.datanhaphosomodal.hinhthucnap = selectedOption;
       }
     },
 
@@ -3771,7 +3054,21 @@ export default {
           return false;
         }
 
-        if (!this.items[i].maphuongthucdong || !this.items[i].phuongthucdong) {
+        if (!this.items[i].tungay) {
+          this.$toasted.show("Thiếu từ ngày", {
+            duration: 3000,
+            theme: "bubble",
+          });
+          if (this.$refs.tungayInput[i]) {
+            this.$refs.tungayInput[i].focus();
+          }
+          return false;
+        }
+
+        if (
+          !this.items[i].maphuongthucdong ||
+          !this.items[i].tenphuongthucdong
+        ) {
           this.$toasted.show("Thiếu phương thức đóng", {
             duration: 3000,
             theme: "bubble",
@@ -3815,6 +3112,17 @@ export default {
         //   return false;
         // }
 
+        if (!this.items[i].mabenhvien || !this.items[i].tenbenhvien) {
+          this.$toasted.show("Chọn bệnh viện", {
+            duration: 3000,
+            theme: "bubble",
+          });
+          if (this.$refs.hopInput[i]) {
+            this.$refs.hopInput[i].focus();
+          }
+          return false;
+        }
+
         if (!this.items[i].hinhthucnap) {
           this.$toasted.show("Chọn hình thức nạp tiền", {
             duration: 3000,
@@ -3825,6 +3133,40 @@ export default {
           }
           return false;
         }
+
+        // biên lai
+        // if (!this.isValidSobienlai(this.items[i].sobienlai)) {
+        //   this.$toasted.show("Số biên lai phải 7 số", {
+        //     duration: 3000,
+        //     theme: "bubble",
+        //   });
+        //   if (this.$refs.sobienlaiInput[i]) {
+        //     this.$refs.sobienlaiInput[i].focus();
+        //   }
+        //   return false;
+        // }
+
+        // if (!this.items[i].sobienlai) {
+        //   this.$toasted.show("Chưa nhập số biên lai", {
+        //     duration: 3000,
+        //     theme: "bubble",
+        //   });
+        //   if (this.$refs.sobienlaiInput[i]) {
+        //     this.$refs.sobienlaiInput[i].focus();
+        //   }
+        //   return false;
+        // }
+
+        // if (!this.items[i].ngaybienlai) {
+        //   this.$toasted.show("Chưa nhập ngày biên lai", {
+        //     duration: 3000,
+        //     theme: "bubble",
+        //   });
+        //   if (this.$refs.ngaybienlaiInput[i]) {
+        //     this.$refs.ngaybienlaiInput[i].focus();
+        //   }
+        //   return false;
+        // }
       }
       // Nếu tất cả thông tin đều hợp lệ, trả về true để cho phép quá trình lưu dữ liệu
       return true;
@@ -3853,29 +3195,24 @@ export default {
       }
     },
 
-    tinhDenThang(tuNgay, soThang) {
-      // Chuyển đổi tuNgay từ chuỗi "mm/yyyy" sang đối tượng Date
-      const [month, year] = tuNgay.split("/").map(Number);
-      // console.log(month, year);
-
-      let startDate = new Date(year, month - 1); // Month in Date is 0-based
-      // console.log(startDate);
+    calculateEndDate(tuNgay, soThang) {
+      // Chuyển đổi tuNgay từ chuỗi "dd/mm/yyyy" sang đối tượng Date
+      const [day, month, year] = tuNgay.split("/").map(Number);
+      let startDate = new Date(year, month - 1, day); // Month in Date is 0-based
 
       // Cộng thêm số tháng vào ngày bắt đầu
-      startDate.setMonth(startDate.getMonth() + Number(soThang - 1));
+      startDate.setMonth(startDate.getMonth() + Number(soThang));
 
-      // // Trừ một ngày để có ngày cuối cùng của tháng trước tháng kết thúc
-      // startDate.setDate(startDate.getDate() - 1);
+      // Trừ một ngày để có ngày cuối cùng của tháng trước tháng kết thúc
+      startDate.setDate(startDate.getDate() - 1);
 
       // Lấy ngày, tháng, năm của ngày kết thúc
       let endDay = String(startDate.getDate()).padStart(2, "0");
       let endMonth = String(startDate.getMonth() + 1).padStart(2, "0"); // Month is 0-based, so add 1
       let endYear = startDate.getFullYear();
 
-      // console.log(`${endMonth}/${endYear}`);
-
-      // Trả về ngày kết thúc dưới dạng "mm/yyyy"
-      return `${endMonth}/${endYear}`;
+      // Trả về ngày kết thúc dưới dạng "dd/mm/yyyy"
+      return `${endDay}/${endMonth}/${endYear}`;
     },
 
     generateUniqueString() {
@@ -3894,161 +3231,152 @@ export default {
       }
     },
 
-    async guiDulieuLenCongBhxhvn(data) {
-      const nowInVietnam = DateTime.now().setZone("Asia/Ho_Chi_Minh");
-      const formattedDate = nowInVietnam.toFormat("dd-MM-yyyy HH:mm:ss");
+    hoanTatDongHs() {
+      // console.log("hoantatdong");
+      this.items = [];
+      this.dulieuTravedeinbienlai = [];
+      this.dulieuInbienlai = [];
+      this.isActive_xacnhan = false;
+    },
 
-      // console.log(data);
-      let matochucDvt = "";
-      if (data.maloaihinh == "AR") {
-        matochucDvt = "AR0013M";
-      } else if (data.maloaihinh == "BI") {
-        matochucDvt = "BI0007M";
-      } else {
-        matochucDvt = "IS0012M";
+    async onSave() {
+      // đoạn này theo code mới là sẽ bấm để lưu dữ liệu biên lai
+      // Kiểm tra dữ liệu trước khi ghi
+      // console.log(this.dulieuTravedeinbienlai);
+      const isDataValid = await this.checkFormData();
+      if (!isDataValid) {
+        // Dừng quá trình lưu dữ liệu nếu dữ liệu không hợp lệ
+        return;
       }
 
-      // thông tin biên lai
-      const currentYear = new Date().getFullYear();
-      let curentInvoiceNumber = 0;
-
-      const getCurrentSobienlai = await this.$axios.get(
-        `/api/kekhai/sobienlai`
-      );
-      // console.log(getCurrentSobienlai.data.bienlai[0].sobienlai);
-      curentInvoiceNumber = getCurrentSobienlai.data.bienlai[0].sobienlai;
-      // console.log(curentInvoiceNumber);
-
-      const dataPost = {
-        hosoIdentity: data.hosoIdentity,
-        maSoBhxh: data.masobhxh,
-        hoTen: data.hoten,
-        soCccd: data.cccd,
-        ngaySinh: data.ngaysinh,
-        gioiTinh: data.gioitinh,
-        soDienThoai: data.dienthoai,
-        loaiDt: data.tenloaihinh,
-        soTien: data.sotien,
-        soThang: data.maphuongthucdong,
-        maToChucDvt: matochucDvt,
-        tenToChucDvt: data.tentochuc,
-        maNhanVienThu: "NVT" + data.cccd,
-        tenNhanVienThu: this.user.name,
-        maCqBhxh: this.user.macqbhxh,
-        tenCqBhxh: this.user.tencqbhxh,
-        keyfrombhvn: data.key,
-        tuNgay: data.tungay,
-        denNgay: data.denngay,
-        tuThang: data.tuthang,
-        denThang: data.denthang,
-        maDaiLy: data.madaily,
-        tenDaiLy: data.tendaily,
-        soHoSo: data.sohoso,
-        dotKeKhai: data.dotkekhai,
-        kyKeKhai: data.kykekhai,
-        ngayKeKhai: data.ngaykekhai,
-        createdBy: this.user.username,
-        sobienlai: curentInvoiceNumber,
-        ngaybienlai: formattedDate,
-        maloaihinh: data.maloaihinh,
-        currentYear: currentYear,
-      };
-
-      // console.log(dataPost);
-
       const result = await Swal.fire({
-        title: `Xác nhận gửi hồ sơ lên cổng BHXH VN ?`,
+        title: `Xác nhận biên lai điện tử?`,
         showDenyButton: true,
         confirmButtonText: "Xác nhận",
-        denyButtonText: `Hủy`,
+        denyButtonText: `Hủy gửi`,
       });
       if (result.isConfirmed) {
-        // const url = '10.0.119.10:8186/dvtService/api/DVT/insertThongtin'
-        const url = `/api/kekhai/pushinfotoportbhxhvn`;
+        // console.log(this.items);
 
-        const headers = {
-          "Content-Type": "application/json",
-          Charset: "utf-8",
-        };
-
+        // const current = new Date();
+        const nowInVietnam = DateTime.now().setZone("Asia/Ho_Chi_Minh");
+        const formattedDate = nowInVietnam.toFormat("dd-MM-yyyy HH:mm:ss");
         try {
-          const response = await this.$axios.post(url, dataPost, { headers });
-          // console.log(response);
-          // response.data.data
-          const resDatafromBHXHVN = {
-            maLoi: response.data.data.maLoi,
-            moTaLoi: response.data.data.moTaLoi,
-            maXacNhan: response.data.data.maXacNhan,
-            noiDung: response.data.data.noiDung,
-          };
+          // Bắt đầu hiển thị biểu tượng loading
+          this.isLoading = true;
+          // thông tin biên lai
+          const currentYear = new Date().getFullYear();
 
-          // Kết hợp dataPost và resDatafromBHXHVN
-          const combinedData = {
-            ...dataPost,
-            ...resDatafromBHXHVN,
-          };
+          // lấy tên biên lai để lưu
+          for (let i = 0; i < this.dulieuTravedeinbienlai.length; i++) {
+            const item = this.dulieuTravedeinbienlai[i];
 
-          // console.log(combinedData);
+            const formattedForFilename = formattedDate.replace(/[-: ]/g, "_");
+            const urlNameInvoice = `${item.hosoIdentity}_${formattedForFilename}_${item.sobienlai}_${item.hoten}`;
 
-          if (response.data.data.maLoi == 0) {
-            // ghi dữ liệu biên lai
+            const dataPost = {
+              hosoIdentity: item.hosoIdentity,
+              maSoBhxh: item.masobhxh,
+              hoTen: item.hoten,
+              soCccd: item.cccd,
+              ngaySinh: item.ngaysinh,
+              gioiTinh: item.gioitinh,
+              soDienThoai: item.dienthoai,
+              nguoithutien: item.tennguoitao,
+              loaiDt: item.tenloaihinh,
+              soTien: item.sotien,
+              soThang: item.maphuongthucdong,
+              tuNgay: item.tungay,
+              denNgay: item.denngay,
+              tuThang: item.tuthang,
+              denThang: item.denthang,
+              maDaiLy: item.madaily,
+              tenDaiLy: item.tendaily,
+              createdBy: this.user.username,
+              sobienlai: item.sobienlai,
+              ngaybienlai: formattedDate,
+              maloaihinh: item.maloaihinh,
+              tothon: item.tothon,
+              tenquanhuyen: item.tenquanhuyen,
+              tentinh: item.tentinh,
+              currentYear: currentYear,
+              urlNameInvoice: urlNameInvoice,
+            };
+
             const ghibienlai = await this.$axios.post(
               `/api/kekhai/ghidulieubienlai`,
-              combinedData
+              dataPost
             );
 
-            // console.log(ghibienlai);
-
-            const result = await this.$axios.post(
-              `/api/kekhai/saveresponsefrombhvntodb`,
-              combinedData
-            );
-            // console.log(result);
-            if (result.data.success == true) {
-              // Cập nhật trạng thái isSent
-              data.isSent = true;
-
-              const Toast = Swal.mixin({
-                toast: true,
-                position: "top-end",
-                showConfirmButton: false,
-                timer: 3000,
-                timerProgressBar: true,
-                didOpen: (toast) => {
-                  toast.addEventListener("mouseenter", Swal.stopTimer);
-                  toast.addEventListener("mouseleave", Swal.resumeTimer);
-                },
-              });
-              Toast.fire({
-                icon: "success",
-                title: "Đã gửi thông tin hồ sơ lên cổng thành công",
-              });
-
-              // đổi trạng thái của hồ sơ trong kê khai
-              let bodyRes = {};
-              bodyRes = result.data.datares;
-              // console.log(bodyRes);
-              bodyRes._id = data._id;
-
-              const resUpdate = await this.$axios.patch(
-                `/api/kekhai/capnhatkekhai`,
-                bodyRes
-              );
-              // console.log(resUpdate);
-            }
+            // lưu biên lai vào máy chủ
+            await this.inBienLaiDientu(dataPost);
+            // console.log("xongbienlai");
           }
+
+          const hosoIds = this.dulieuTravedeinbienlai.map(
+            (item) => item.hosoIdentity
+          );
+
+          const rsIdtity = await this.$axios.post(
+            `/api/kekhai/getdskekhaiwithhsidentity`,
+            hosoIds
+          );
+          this.dulieuTravedeinbienlai = rsIdtity.data;
+          this.isLoading = false;
+          this.lockButtonXacnhaninbldt = true; // khoá nút xác nhận biên lai điện tử
+
+          Swal.fire({
+            title: "Hoàn tất xác nhận toàn bộ hồ sơ!",
+            icon: "success",
+          });
+          // console.log("check hàm xem biên lai:", this.xemBienLai);
         } catch (error) {
-          console.error("Error posting data:", error);
-          throw error;
+          // console.log(error);
+          this.isLoading = false;
         }
+      }
+    },
+
+    async xemBienLai(item) {
+      // console.log(item.hosoIdentity);
+
+      try {
+        const res = await this.$axios.get(
+          `/api/kekhai/view-item-bienlai?hosoIdentity=${item.hosoIdentity}`
+        );
+
+        // console.log(res);
+
+        const hs = res.data.hs;
+        if (hs && hs.urlNameInvoice) {
+          const fileName = `${hs.sobienlai}_${encodeURIComponent(
+            hs.hoten
+          )}.pdf`;
+          const pdfUrl = `http://14.224.129.177:1970/bienlaidientu/${hs.urlNameInvoice}.pdf`;
+          // const pdfUrl = `http://localhost:1970/bienlaidientu/${hs.urlNameInvoice}.pdf`;
+          // console.log(pdfUrl);
+
+          window.open(pdfUrl, "_blank");
+        } else {
+          console.warn("Thiếu thông tin số biên lai hoặc họ tên!");
+          this.$swal.fire({
+            icon: "error",
+            title: "Lỗi",
+            text: "Không lấy được thông tin biên lai.",
+          });
+        }
+      } catch (error) {
+        console.error("Lỗi khi gọi API:", error);
+        this.$swal.fire({
+          icon: "error",
+          title: "Lỗi",
+          text: "Không thể kết nối đến máy chủ.",
+        });
       }
     },
 
     async onSave1() {
       const matochuc = this.user.matochuc;
-      const parts = matochuc.split("-");
-      const mst = parts[parts.length - 1];
-      // Xây dựng đường dẫn API dựa trên mã số thuế
 
       if (this.items.length <= 0) {
         const Toast = Swal.mixin({
@@ -4082,6 +3410,9 @@ export default {
           denyButtonText: `Hủy gửi`,
         });
         if (result.isConfirmed) {
+          // console.log(this.items);
+
+          // const current = new Date();
           const nowInVietnam = DateTime.now().setZone("Asia/Ho_Chi_Minh");
           const formattedDate = nowInVietnam.toFormat("dd-MM-yyyy HH:mm:ss");
           const kyKeKhaiFrm = nowInVietnam.toFormat("MM/yyyy");
@@ -4091,33 +3422,17 @@ export default {
           try {
             for (let i = 0; i < this.items.length; i++) {
               this.items[i].sotien = this.items[i].sotien.replace(/,/g, "");
-
-              this.items[i].muctiendong = this.items[i].muctiendong.replace(
+              this.items[i].tienluongcs = this.items[i].tienluongcs.replace(
                 /,/g,
                 ""
               );
 
-              // Nếu ngày sinh từ db người hưởng sẽ có dạng text không cần chuyển đổi
-              // Nếu từ input dạng yyyy-mm-dd thì phải đổi thành text
-              // const dateFormat = this.identifyDateFormat(
-              //   this.items[i].ngaysinh
-              // );
-              // if (dateFormat == "YYYY-MM-DD") {
-              //   const ngaysinhTranform = this.convertDate(
-              //     this.items[i].ngaysinh
-              //   );
-              //   this.items[i].ngaysinh = ngaysinhTranform;
-              // }
-
-              this.items[i].denthang = this.tinhDenThang(
-                this.items[i].tuthang,
+              this.items[i].denngay = this.calculateEndDate(
+                this.items[i].tungay,
                 this.items[i].maphuongthucdong
               );
 
-              // console.log(this.user.name);
-
               this.items[i].tennguoitao = this.user.name;
-
               // ngày biên lai
               // const ngaybienlaiTranform = this.convertDate(
               //   this.items[i].ngaybienlai
@@ -4129,6 +3444,22 @@ export default {
               this.items[i].createdBy = this.user.username;
               this.items[i].updatedAt = "";
               this.items[i].updatedBy = "";
+
+              // thông tin bộ hồ sơ nạp
+              this.items[i].nvt_masobhxh = this.user.masobhxh;
+              this.items[i].nvt_cccd = this.user.cccd;
+              this.items[i].kykekhai = kyKeKhaiFrm;
+              this.items[i].ngaykekhai = formattedDate;
+
+              // đánh dấu hồ sơ đã nạp luôn
+              this.items[i].trangthai = 0;
+
+              const uniqueString = this.generateUniqueString();
+              this.items[i].hosoIdentity =
+                uniqueString +
+                this.items[i].masobhxh +
+                this.items[i].cccd +
+                this.user.username;
 
               // **** thêm các thông tin để gửi dữ liệu lên cổng tiếp nhận BHXH VN
               // số tiền, số tháng kiểu float và kiểu int cho từng loại
@@ -4144,29 +3475,17 @@ export default {
               // AR0212M	Tổ chức dịch vụ thu BHYT HGĐ có MSTB - Công ty TNHH An Sinh 159
               // IS0212M	Tổ chức dịch vụ thu BHXH TN - Công ty TNHH An Sinh 159
 
-              let maToChucDvt = "IS0212M";
+              let maToChucDvt = "AR0212M";
               let soTien = this.items[i].sotien;
               let soThang = this.items[i].maphuongthucdong;
-              let maNhanVienThu = "NVT" + this.user.cccd;
+              let maNhanVienThu = "NVT" + this.items[i].nvt_cccd;
               let tenNhanVienThu = this.user.name;
               let maCqBhxh = this.user.macqbhxh;
               let tenCqBhxh = this.user.tencqbhxh;
               let key = "0123"; // do bhxh vn cung cấp
-              let tuNgay = this.items[i].tuthang;
-              let denNgay = this.tinhDenThang(tuNgay, soThang);
+              let tuNgay = this.items[i].tungay;
+              let denNgay = this.calculateEndDate(tuNgay, soThang);
 
-              // thông tin bộ hồ sơ nạp
-              this.items[i].nvt_masobhxh = this.user.masobhxh;
-              this.items[i].nvt_cccd = this.user.cccd;
-              this.items[i].kykekhai = kyKeKhaiFrm;
-              this.items[i].ngaykekhai = formattedDate;
-
-              const uniqueString = this.generateUniqueString();
-              this.items[i].hosoIdentity =
-                uniqueString +
-                this.items[i].masobhxh +
-                this.items[i].cccd +
-                this.user.username;
               // Loại bỏ dữ liệu không cần thiết bằng destructuring
               const {
                 info_benhvien,
@@ -4199,14 +3518,30 @@ export default {
                 ...additionalData,
               });
 
+              // tạo biên lai trước khi lưu hồ sơ kê khai
+              // console.log(dataKekhai);
+              // in biên lai
+              const nowInVietnam = DateTime.now().setZone("Asia/Ho_Chi_Minh");
+              // const formattedDate = nowInVietnam.toFormat(
+              //   "dd-MM-yyyy HH:mm:ss"
+              // );
+
               // thông tin biên lai
               const currentYear = new Date().getFullYear();
+              // console.log(currentYear);
+
+              // console.log(nextInvoice);
+
+              // console.log(this.items[i].sotien);
+              const tiendong = parseInt(
+                this.items[i].sotien.replace(/,/g, ""),
+                10
+              );
 
               // lấy tên biên lai để lưu
               const formattedForFilename = formattedDate.replace(/[-: ]/g, "_");
-              // console.log(formattedForFilename);
-
               const urlNameInvoice = `${this.items[i].hosoIdentity}_${formattedForFilename}_${this.items[i].hoten}`;
+
               // console.log(urlNameInvoice);
 
               const dataPost = {
@@ -4219,7 +3554,7 @@ export default {
                 soDienThoai: this.items[i].dienthoai,
                 nguoithutien: this.items[i].tennguoitao,
                 loaiDt: this.items[i].tenloaihinh,
-                soTien: this.items[i].sotien,
+                soTien: tiendong,
                 soThang: this.items[i].maphuongthucdong,
                 tuNgay: this.items[i].tungay,
                 denNgay: this.items[i].denngay,
@@ -4238,8 +3573,6 @@ export default {
                 urlNameInvoice: urlNameInvoice,
               };
 
-              // console.log(dataPost);
-
               const ghibienlai = await this.$axios.post(
                 `/api/kekhai/ghidulieubienlai`,
                 dataPost
@@ -4249,6 +3582,8 @@ export default {
               await this.inBienLaiDientu(dataPost);
               // console.log("xongbienlai");
             }
+
+            // console.log(dataKekhai);
 
             const result = await this.$axios.post(
               `/api/kekhai/add-kekhai-series`,
@@ -4275,7 +3610,7 @@ export default {
     },
 
     async inBienLaiDientu(data) {
-      // console.log(data);
+      // console.log("dữ liệu tạo pdf: ", data);
 
       // const res = await this.$axios(
       //   `/api/kekhai/bienlaidientu?_id_hskk=${item._id}&hosoIdentity=${item.hosoIdentity}`
@@ -4649,9 +3984,51 @@ export default {
       });
     },
 
+    async onFileChange(e) {
+      this.fileName = e.target.files[0].name;
+      this.selectedFile = e.target.files[0];
+      const files = e.target.files;
+
+      const fileReader = new FileReader(); // construction function that can read the file content
+      fileReader.onload = (ev) => {
+        const data = ev.target.result;
+        const workbook = XLSX.read(data, {
+          type: "binary", // binary
+        });
+        const wsname = workbook.SheetNames[0]; //take the first sheet
+        const ws = XLSX.utils.sheet_to_json(workbook.Sheets[wsname]); //Get the data in this table
+        this.items = ws;
+        // ws.forEach((template) => {
+        //   this.items.forEach((item) => {
+        //     // Duyệt qua các trường của template
+        //     for (const key in template) {
+        //       if (item.hasOwnProperty(key)) {
+        //         // Nếu item có trường giống với template, ghi đè giá trị
+        //         item[key] = template[key];
+        //       }
+        //     }
+        //   });
+        // });
+      };
+
+      fileReader.readAsBinaryString(files[0]); // read file, trigger onload
+    },
+
     capitalizeFirstLetter(str) {
       if (!str) return "";
       return str.charAt(0).toUpperCase() + str.slice(1);
+    },
+
+    async importKekhai() {
+      // thêm các thứ sau. 1. import XLSX from "xlsx"
+      // 2. thêm isActive_import (vào data); 3. thêm fileName: "", và selectedFile: null, vào data
+      // thêm @click="importKekhai" cho button trên cùng
+      this.isActive_import = true;
+    },
+
+    cancelImport() {
+      this.isActive_import = false;
+      this.items = [];
     },
   },
 };
@@ -4661,4 +4038,22 @@ export default {
 @import "@/assets/customCss/common.css";
 
 @import "@/assets/customCss/footerTable.css";
+
+/* Tùy chỉnh chiều cao của danh sách */
+.vs__dropdown-menu {
+  max-height: 50px; /* Giảm chiều cao của danh sách */
+  overflow-y: auto; /* Thêm thanh cuộn */
+}
+
+/* Tùy chỉnh chiều cao item trong danh sách */
+.vs__dropdown-option {
+  line-height: 1.2; /* Giảm chiều cao của mỗi mục */
+  padding: 4px 8px; /* Tùy chỉnh padding */
+}
+
+/* Tùy chỉnh hướng xổ lên */
+.vs__dropdown-container {
+  position: absolute !important;
+  transform: translateY(-100%) !important;
+}
 </style>

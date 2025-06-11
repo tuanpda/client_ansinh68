@@ -54,20 +54,22 @@
                 <td style="text-align: center">{{ index + 1 }}</td>
                 <td style="">{{ item._id }}</td>
                 <td style="text-align: center">
-                  <template v-if="item.trangthai == 0"
-                    ><span style="font-weight: 700; color: #00947e"
-                      >Đã lên cổng</span
+                  <template v-if="item.trangthai === 1">
+                    <span style="font-weight: 700; color: #ffc107"
+                      >Đã huỷ duyệt</span
                     ></template
                   >
-                  <template v-else-if="item.status_hosoloi == 1">
-                    <span style="font-weight: 800; color: red"
-                      >Hồ sơ bị trả</span
-                    >
-                  </template>
-                  <template v-else="item.status_hosoloi == 1">
-                    <span style="font-weight: 800; color: #6f42c1"
-                      >Chưa đẩy</span
-                    >
+                  <template v-else>
+                    <template v-if="item.status_naptien == 1">
+                      <span style="font-weight: 700; color: #00947e"
+                        >Đã duyệt</span
+                      >
+                    </template>
+                    <template v-else>
+                      <span style="font-weight: 700; color: #dc3545"
+                        >Chưa duyệt</span
+                      >
+                    </template>
                   </template>
                 </td>
 
@@ -291,18 +293,20 @@ export default {
     totalSoTien() {
       if (this.data_kekhai && this.data_kekhai.length > 0) {
         return this.data_kekhai.reduce((acc, item) => {
-          // Xóa tất cả dấu phẩy và sau đó chuyển đổi thành số
-          const sotienStr = item.sotien.toString().replace(/,/g, ""); // Loại bỏ dấu phẩy
-          let numericValue = parseFloat(sotienStr); // Chuyển thành số
+          if (item.status_naptien === true) {
+            const sotienStr = item.sotien.toString().replace(/,/g, ""); // Loại bỏ dấu phẩy
+            let numericValue = parseFloat(sotienStr); // Chuyển thành số
 
-          if (isNaN(numericValue)) {
-            numericValue = 0; // Xử lý nếu giá trị không hợp lệ
+            if (isNaN(numericValue)) {
+              numericValue = 0;
+            }
+
+            return acc + numericValue;
           }
-
-          return acc + numericValue; // Cộng vào tổng
+          return acc; // Bỏ qua nếu status_naptien != 1
         }, 0);
       }
-      return 0; // Trường hợp không có dữ liệu
+      return 0;
     },
 
     visiblePages() {

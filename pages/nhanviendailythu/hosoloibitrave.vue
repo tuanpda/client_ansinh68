@@ -333,18 +333,20 @@ export default {
     totalSoTien() {
       if (this.data_kekhai && this.data_kekhai.length > 0) {
         return this.data_kekhai.reduce((acc, item) => {
-          // Xóa tất cả dấu phẩy và sau đó chuyển đổi thành số
-          const sotienStr = item.sotien.toString().replace(/,/g, ""); // Loại bỏ dấu phẩy
-          let numericValue = parseFloat(sotienStr); // Chuyển thành số
+          if (item.trangthai === 1) {
+            const sotienStr = item.sotien.toString().replace(/,/g, ""); // Loại bỏ dấu phẩy
+            let numericValue = parseFloat(sotienStr); // Chuyển thành số
 
-          if (isNaN(numericValue)) {
-            numericValue = 0; // Xử lý nếu giá trị không hợp lệ
+            if (isNaN(numericValue)) {
+              numericValue = 0;
+            }
+
+            return acc + numericValue;
           }
-
-          return acc + numericValue; // Cộng vào tổng
+          return acc; // Bỏ qua nếu status_naptien != 1
         }, 0);
       }
-      return 0; // Trường hợp không có dữ liệu
+      return 0;
     },
 
     visiblePages() {

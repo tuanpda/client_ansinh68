@@ -122,7 +122,7 @@
                 </span>
                 &ensp; Lịch sử kê khai
               </nuxt-link> -->
-              <nuxt-link
+              <!-- <nuxt-link
                 to="/nhanviendailythu/tracuuhosokekhai"
                 class="navbar-item"
               >
@@ -130,7 +130,7 @@
                   <i class="far fa-calendar-alt"></i>
                 </span>
                 &ensp; Tra cứu Hồ sơ kê khai
-              </nuxt-link>
+              </nuxt-link> -->
               <!-- <nuxt-link to="/nhanviendailythu/timkiemhoso" class="navbar-item">
                 <span style="color: #3850b7" class="icon is-small is-left">
                   <i class="far fa-calendar-alt"></i>
@@ -143,7 +143,7 @@
                 </span>
                 &ensp; Tạo kê khai
               </nuxt-link>
-              <nuxt-link
+              <!-- <nuxt-link
                 to="/nhanviendailythu/quanlylaodong"
                 class="navbar-item"
               >
@@ -151,7 +151,7 @@
                   <i class="fab fa-creative-commons-by"></i>
                 </span>
                 &ensp; Quản lý lao động
-              </nuxt-link>
+              </nuxt-link> -->
               <nuxt-link
                 to="/nhanviendailythu/tracuuhanthe"
                 class="navbar-item"
