@@ -447,6 +447,7 @@
                         <td style="text-align: center">
                           Trạng thái gửi HUỶ phê duyệt vào hệ thống
                         </td>
+                        <td style="text-align: center">Lý do hủy duyệt</td>
                         <td style="text-align: center">Lỗi (nếu có)</td>
                       </tr>
                     </thead>
@@ -467,6 +468,9 @@
                         </td>
                         <td style="text-align: center">
                           {{ item.status }}
+                        </td>
+                        <td style="text-align: center">
+                          {{ item.ghichu }}
                         </td>
                         <td style="text-align: center">
                           {{ item.error }}
@@ -997,7 +1001,7 @@ export default {
     },
 
     // HÀM HUỶ DUYỆT HỒ SƠ TRANGTHAI=1
-    async xacHUYNhanBienLai() {
+    async xacHUYNhanBienLai1() {
       if (!this.selectedItems || this.selectedItems.length === 0) {
         Swal.fire({
           icon: "warning",
@@ -1051,6 +1055,92 @@ export default {
               _id: item._id,
               hoten: item.hoten,
               masobhxh: item.masobhxh,
+              status: "❌ Lỗi hệ thống",
+              error: error.response?.data?.message || error.message,
+            });
+          }
+        }
+
+        // Hiển thị kết quả ra console (bạn có thể dùng để show lên modal)
+        // console.table(ketquaTongHop);
+        this.dulieuHuyPheDuyet = ketquaTongHop;
+        this.dulieuPheduyet = []; // Reset dữ liệu phê duyệt
+
+        this.isActive_fix = true;
+      }
+    },
+
+    async xacHUYNhanBienLai() {
+      if (!this.selectedItems || this.selectedItems.length === 0) {
+        Swal.fire({
+          icon: "warning",
+          title: "Chưa chọn hồ sơ",
+          text: "Vui lòng chọn ít nhất một hồ sơ trước khi xác nhận.",
+        });
+        return;
+      }
+
+      const { value: lyDo, isConfirmed } = await Swal.fire({
+        title: "Lý do hủy duyệt",
+        input: "textarea",
+        inputLabel: "Nhập lý do hủy duyệt hồ sơ",
+        inputPlaceholder: "Nhập lý do tại đây...",
+        inputAttributes: {
+          "aria-label": "Nhập lý do hủy duyệt hồ sơ",
+        },
+        showCancelButton: true,
+        confirmButtonText: "Xác nhận hủy duyệt",
+        cancelButtonText: "Hủy",
+        inputValidator: (value) => {
+          if (!value) {
+            return "Bạn phải nhập lý do HỦY hồ sơ này!";
+          }
+        },
+      });
+
+      if (isConfirmed && lyDo) {
+        // Thực hiện xử lý với lý do
+        console.log("Lý do hủy duyệt:", lyDo);
+
+        let ketquaTongHop = [];
+
+        for (const item of this.selectedItems) {
+          try {
+            const res = await this.$axios.post(
+              "/api/kekhai/cancel-invoice-status",
+              {
+                _id: item._id,
+                hoten: item.hoten,
+                masobhxh: item.masobhxh,
+                ghichu: lyDo,
+              }
+            );
+
+            if (res.data.success) {
+              ketquaTongHop.push({
+                _id: res.data.data._id,
+                hoten: res.data.data.hoten,
+                masobhxh: res.data.data.masobhxh,
+                ghichu: res.data.data.ghichu,
+                status: "✅ Thành công",
+                message: res.data.message,
+              });
+            } else {
+              ketquaTongHop.push({
+                _id: res.data.data._id,
+                hoten: res.data.data.hoten,
+                masobhxh: res.data.data.masobhxh,
+                ghichu: res.data.data.ghichu,
+                status: "❌ Thất bại",
+                error: res.data.message,
+              });
+            }
+          } catch (error) {
+            ketquaTongHop.push({
+              _id: item._id,
+              hoten: item.hoten,
+              masobhxh: item.masobhxh,
+              ghichu: res.data.data.ghichu,
               status: "❌ Lỗi hệ thống",
               error: error.response?.data?.message || error.message,
             });
@@ -1128,8 +1218,8 @@ export default {
           const fileName = `${hs.sobienlai}_${encodeURIComponent(
             hs.hoten
           )}.pdf`;
-          const pdfUrl = `http://14.224.129.177:1973/bienlaidientu/${hs.urlNameInvoice}.pdf`;
-          // const pdfUrl = `http://localhost:1973/bienlaidientu/${hs.urlNameInvoice}.pdf`;
+          const pdfUrl = `http://14.224.129.177:1970/bienlaidientu/${hs.urlNameInvoice}.pdf`;
+          // const pdfUrl = `http://localhost:1970/bienlaidientu/${hs.urlNameInvoice}.pdf`;
           // console.log(pdfUrl);
 
           window.open(pdfUrl, "_blank");
