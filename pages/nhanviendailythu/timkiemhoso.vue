@@ -361,14 +361,6 @@
                   >Báo cáo trạng thái DUYỆT hồ sơ</span
                 >
               </div>
-              <div style="text-align: end">
-                <button
-                  @click="isActive = false"
-                  class="button is-small is-info"
-                >
-                  Thoát
-                </button>
-              </div>
 
               <div style="margin-top: 10px">
                 <div v-if="dulieuPheduyet.length > 0" class="table_wrapper">
@@ -435,14 +427,6 @@
                 <span style="font-weight: 800; font-size: 15px; color: #3cb371"
                   >Báo cáo trạng thái HUỶ duyệt hồ sơ</span
                 >
-              </div>
-              <div style="text-align: end">
-                <button
-                  @click="isActive_fix = false"
-                  class="button is-small is-info"
-                >
-                  Thoát
-                </button>
               </div>
 
               <div style="margin-top: 10px">
@@ -1174,11 +1158,15 @@ export default {
     },
 
     closeDanhsachduyet() {
+      this.selectedItems = [];
       this.dulieuPheduyet = [];
+      this.dulieuHuyPheDuyet = [];
       this.isActive = false;
     },
 
     closeDanhsachhuyDuyet() {
+      this.selectedItems = [];
+      this.dulieuPheduyet = [];
       this.dulieuHuyPheDuyet = [];
       this.isActive_fix = false;
     },
