@@ -6,10 +6,11 @@
           <div class="column is-4 is-offset-4">
             <div class="centered-image">
               <img
-                src="@/assets/logos/ansinhphudien-login-logo.png"
+                src="@/assets/logos/ansinh68.png"
                 alt="Your Image"
                 width="150"
                 height="150"
+                style="border-radius: 50%"
               />
             </div>
             <div class="box" style="margin-top: 10px">
