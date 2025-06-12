@@ -8,7 +8,7 @@
       <div class="navbar-brand">
         <nuxt-link to="/" class="navbar-item">
           <div style="font-weight: bold; font-size: 20px; color: #ffe69c">
-            AN.SINH.159
+            AN.SINH.68
           </div>
         </nuxt-link>
         <!-- <a href="/" class="navbar-item">
