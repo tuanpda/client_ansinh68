@@ -1526,7 +1526,7 @@ export default {
       );
       this.dmquanhuyen = res_quanhuyen.data;
       const res_benhvien = await this.$axios.get(
-        `/api/danhmucs/dmbenhvienwithtinh-camxuyen?matinh=${this.matinh}`
+        `/api/danhmucs/dmbenhvienwithtinh-thachha?matinh=${this.matinh}`
       );
       this.dmbenhvien = res_benhvien.data;
     } else {
