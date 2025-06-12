@@ -1865,15 +1865,6 @@ export default {
         return false;
       }
 
-      if (!item.tungay) {
-        this.$toasted.show("Thiếu từ ngày", {
-          duration: 3000,
-          theme: "bubble",
-        });
-        this.$refs.tungayInput[index]?.focus();
-        return false;
-      }
-
       if (!item.maphuongthucdong || !item.tenphuongthucdong) {
         this.$toasted.show("Thiếu phương thức đóng", {
           duration: 3000,
@@ -2869,8 +2860,8 @@ export default {
           const fileName = `${hs.sobienlai}_${encodeURIComponent(
             hs.hoten
           )}.pdf`;
-          const pdfUrl = `http://14.224.129.177:1970/bienlaidientu/${hs.urlNameInvoice}.pdf`;
-          // const pdfUrl = `http://localhost:1970/bienlaidientu/${hs.urlNameInvoice}.pdf`;
+          const pdfUrl = `http://14.224.129.177:1973/bienlaidientu/${hs.urlNameInvoice}.pdf`;
+          // const pdfUrl = `http://localhost:1973/bienlaidientu/${hs.urlNameInvoice}.pdf`;
           // console.log(pdfUrl);
 
           window.open(pdfUrl, "_blank");

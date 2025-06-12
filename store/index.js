@@ -67,7 +67,7 @@ export default () =>
     actions: {
       async nuxtServerInit({ commit }, { app }) {
         try {
-          const res = await app.$axios.$get("http://localhost:1552/api/users/auth/user");
+          const res = await app.$axios.$get("http://localhost:4209/api/users/auth/user");
           // console.log("✅ nuxtServerInit - user lấy được từ API:", res.user);
           commit("setUser", res.user); // hoặc res nếu không có .user
         } catch (error) {
