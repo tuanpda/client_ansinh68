@@ -90,6 +90,12 @@
                     <i style="color: #198754" class="fab fa-angellist"></i>
                   </span>
                 </a>
+                &nbsp;
+                <a @click="checkHgd(item)" title="Thông tin HGĐ">
+                  <span class="icon is-small">
+                    <i style="color: #0d6efd" class="fab fa-audible"></i>
+                  </span>
+                </a>
               </td>
               <td style="text-align: center; vertical-align: middle">
                 {{ index + 1 }}
@@ -1849,26 +1855,24 @@ export default {
         const isDuplicate = this.items.some(
           (item, idx) => idx !== index && item.masobhxh === masobhxh
         );
-
         if (isDuplicate) {
           Swal.fire({
             text: `Mã số ${masobhxh} vừa được đăng ký trong loại hình này xong, vui lòng kiểm tra lại!`,
             icon: "error",
           });
-
-          // Xoá mã số BHXH vừa nhập
           this.items[index].masobhxh = "";
           return;
         }
 
         try {
-          // const res = await this.$axios.get(
-          //   `/api/nguoihuong/find-nguoihuong-masobhxh-theodstg?soBhxh=${masobhxh}`
-          // );
+          this.isLoading = true;
+          // 1. Trường họp đầu tiên nếu có trong dữ liệu thẻ
+          // Đầu tiên AR và BI sẽ tìm trong dữ liệu thẻ -- db dulieuthe.
+          // Chạy API dưới đây để tìm trong dlt
           const res = await this.$axios.get(
             `/api/nguoihuong/find-nguoihuong-masobhxh-theodstg-timhanthe?soSoBhxh=${masobhxh}`
           );
-          this.isLoading = true;
+
           // console.log(res.data);
           if (res.data.length > 0) {
             // Tìm bản ghi có denNgay lớn nhất
@@ -1882,14 +1886,14 @@ export default {
               return currDate > maxDate ? curr : max;
             });
 
-            // tìm căn cước công dân trong dữ liệu TG
+            // Tìm căn cước công dân trong dữ liệu HGD
             const resHGD = await this.$axios.get(
-              `/api/nguoihuong/find-nguoihuong-masobhxh-theodstg?soBhxh=${masobhxh}`
+              `/api/nguoihuong/tim-kiem-thong-tin-hgd?soBhxh=${masobhxh}&SO_DDCN_CCCD_BCA=''`
             );
             let soCmnd_hgd = "";
-            // console.log(resHGD);
-            if (resHGD.data.success == 1) {
-              soCmnd_hgd = resHGD.data.data[0].soCmnd;
+            // console.log(resHGD.data.canhan.SO_DDCN_CCCD_BCA);
+            if (resHGD.data.canhan !== null) {
+              soCmnd_hgd = resHGD.data.canhan.SO_DDCN_CCCD_BCA;
               // console.log(resHGD);
             }
 
@@ -1936,9 +1940,6 @@ export default {
               const today = new Date();
               const denNgay = parseDate(denNgayStr);
               const bienLai = today;
-
-              // console.log("đến ngày: ", denNgay);
-              // console.log("biên lai: ", bienLai);
 
               let tuNgay;
 
@@ -1994,39 +1995,147 @@ export default {
               }
               this.items[index].tothon = data.diaChi;
               this.items[index].benhvientinh = data.maTinhLh;
-              // this.items[index].mabenhvien = data.NoiKhamChuaBenh;
-              // đi tìm tên bệnh viện kcb
-              // const maBv = `${this.matinh}${data.NoiKhamChuaBenh}`;
-              // const res_bv = await this.$axios.get(
-              //   `/api/nguoihuong/find-benhvien?mabenhvien=${maBv}`
-              // );
-              // if (res_bv.data.length > 0) {
-              //   this.items[index].tenbenhvien = res_bv.data[0].tenbenhvien;
-              // }
             } catch (error) {
               console.log(error.message);
             }
           } else {
-            this.isLoading = false;
-            const Toast = Swal.mixin({
-              toast: true,
-              position: "top-end",
-              showConfirmButton: false,
-              timer: 3000,
-              timerProgressBar: true,
-              didOpen: (toast) => {
-                toast.addEventListener("mouseenter", Swal.stopTimer);
-                toast.addEventListener("mouseleave", Swal.resumeTimer);
-              },
-            });
-            Toast.fire({
-              icon: "error",
-              title: "Không tìm thấy dữ liệu trong kho người hưởng",
-            });
-            return;
+            // 2. Trường hợp không có trong dữ liệu thẻ thì đi tìm trong DL HGD
+            const resHGD = await this.$axios.get(
+              `/api/nguoihuong/tim-kiem-thong-tin-hgd?soBhxh=${masobhxh}&SO_DDCN_CCCD_BCA=''`
+            );
+            // console.log(resHGD);
+            if (resHGD.data.canhan !== null) {
+              // console.log(resHGD);
+              this.isLoading = false;
+              const data = resHGD.data.canhan;
+              try {
+                this.items[index].hoten = data.hoTen;
+                this.items[index].ngaysinh = data.ngaySinh;
+                // console.log(typeof data.gioiTinh);
+                this.items[index].cccd = data.SO_DDCN_CCCD_BCA;
+                this.items[index].gioitinh = data.gioiTinh;
+                this.items[index].dienthoai = data.soDienThoai;
+
+                if (data.hanThe !== "") {
+                  this.hanthecu = data.hanThe.split("-")[1]; // Kết quả: "31/12/2025"
+
+                  // this.hanthecu = "31/04/2025"; -- dùng để test
+                  // console.log(this.hanthecu);
+                  // Hàm parse định dạng dd/mm/yyyy thành Date
+                  const parseDate = (str) => {
+                    const [day, month, year] = str.split("/").map(Number);
+                    return new Date(year, month - 1, day);
+                  };
+
+                  // Hàm format Date về dd/mm/yyyy
+                  const formatDate = (date) => {
+                    const d = String(date.getDate()).padStart(2, "0");
+                    const m = String(date.getMonth() + 1).padStart(2, "0");
+                    const y = date.getFullYear();
+                    return `${d}/${m}/${y}`;
+                  };
+
+                  const today = new Date();
+                  const denNgay = parseDate(this.hanthecu);
+                  const bienLai = today;
+
+                  // console.log(denNgay);
+
+                  let tuNgay;
+
+                  if (denNgay >= today) {
+                    // Chưa hết hạn → ngày kế tiếp
+                    const nextDay = new Date(denNgay);
+                    nextDay.setDate(nextDay.getDate() + 1);
+                    tuNgay = nextDay;
+                  } else {
+                    const daysDiff = (today - denNgay) / (1000 * 60 * 60 * 24);
+                    if (daysDiff > 90) {
+                      // Hết hạn > 3 tháng → sau hôm nay 30 ngày
+                      const next30 = new Date();
+                      next30.setDate(next30.getDate() + 30);
+                      tuNgay = next30;
+                    } else {
+                      // Hết hạn < 3 tháng → dùng ngày biên lai
+                      tuNgay = bienLai;
+                    }
+                  }
+
+                  this.items[index].tungay = formatDate(tuNgay);
+                  // console.log("🎯 Hạn thẻ từ (tungay):", this.items[index].tungay);
+                } else {
+                  this.hanthecu = "Không tìm thấy hạn thẻ cũ";
+                  // Gán ngày hiện tại + 30 ngày
+                  const today = new Date();
+                  const next30 = new Date();
+                  next30.setDate(today.getDate() + 30);
+
+                  const formatDate = (date) => {
+                    const d = String(date.getDate()).padStart(2, "0");
+                    const m = String(date.getMonth() + 1).padStart(2, "0");
+                    const y = date.getFullYear();
+                    return `${d}/${m}/${y}`;
+                  };
+
+                  this.items[index].tungay = formatDate(next30);
+                  // console.log(
+                  //   "⚠️ Không có hạn thẻ → gán tungay:",
+                  //   this.items[index].tungay
+                  // );
+                }
+
+                const filename = data.tenFile;
+                const parts = filename.split("_");
+
+                const maTinh = parts[4].replace("TTT", "");
+                const maHuyen = parts[5].replace("HH", "");
+                const maXa = parts[6];
+
+                // console.log("Mã tỉnh:", maTinh); // "42"
+                // console.log("Mã huyện:", maHuyen); // "449"
+                // console.log("Mã xã:", maXa); // "18754"
+
+                this.items[index].matinh = maTinh;
+                // đi tìm tên tỉnh
+                const res_tinh = await this.$axios.get(
+                  `/api/nguoihuong/find-tentinh?matinh=42`
+                );
+                if (res_tinh.data.length > 0) {
+                  this.items[index].tentinh = res_tinh.data[0].tentinh;
+                  // console.log(this.items[index].tentinh);
+                }
+                this.items[index].maquanhuyen = maHuyen;
+                // đi tìm tên quận huyện
+                const res_huyen = await this.$axios.get(
+                  `/api/nguoihuong/find-tenhuyen?matinh=${maTinh}&maquanhuyen=${maHuyen}`
+                );
+                if (res_huyen.data.length > 0) {
+                  this.items[index].tenquanhuyen =
+                    res_huyen.data[0].tenquanhuyen;
+                  // console.log(this.items[index].tenquanhuyen);
+                }
+                this.items[index].maxaphuong = maXa;
+                // đi tìm tên xã
+                const res_xa = await this.$axios.get(
+                  `/api/nguoihuong/find-tenxa?matinh=${maTinh}&maquanhuyen=${maHuyen}&maxaphuong=${maXa}`
+                );
+                // console.log(res_xa);
+
+                if (res_xa.data.length > 0) {
+                  this.items[index].tenxaphuong = res_xa.data[0].tenxaphuong;
+                  // console.log(this.items[index].tenxaphuong);
+                }
+                this.items[index].tothon = data.diaChi;
+                this.items[index].benhvientinh = maTinh;
+              } catch (error) {
+                console.log(error.message);
+              }
+            }
           }
+          this.isLoading = false;
         } catch (error) {
           console.log(error);
+          this.isLoading = false;
         }
       }
     },
@@ -2149,12 +2258,149 @@ export default {
       }
     },
 
-    async checkItem() {
-      const isDataValid = await this.checkFormData();
-      if (!isDataValid) {
-        // Dừng quá trình lưu dữ liệu nếu dữ liệu không hợp lệ
-        return;
-      } else {
+    async checkItemData(item, index) {
+      if (!item.masobhxh) {
+        this.$toasted.show("Thiếu mã số BHXH", {
+          duration: 3000,
+          theme: "bubble",
+        });
+        this.$refs.masobhxhInput[index]?.focus();
+        return false;
+      }
+
+      if (!this.isValidMasoBHXH(item.masobhxh)) {
+        this.$toasted.show("Mã số BHXH không hợp lệ", {
+          duration: 3000,
+          theme: "bubble",
+        });
+        this.$refs.masobhxhInput[index]?.focus();
+        return false;
+      }
+
+      if (!item.hoten) {
+        this.$toasted.show("Thiếu họ tên", { duration: 3000, theme: "bubble" });
+        this.$refs.nameInput[index]?.focus();
+        return false;
+      }
+
+      if (!item.ngaysinh) {
+        this.$toasted.show("Thiếu ngày sinh", {
+          duration: 3000,
+          theme: "bubble",
+        });
+        this.$refs.ngaysinhInput[index]?.focus();
+        return false;
+      }
+
+      if (!item.gioitinh) {
+        this.$toasted.show("Chọn giới tính", {
+          duration: 3000,
+          theme: "bubble",
+        });
+        this.$refs.gioitinhSelect[index]?.focus();
+        return false;
+      }
+
+      if (!item.cccd) {
+        this.$toasted.show("Thiếu CCCD", { duration: 3000, theme: "bubble" });
+        this.$refs.cccdInput[index]?.focus();
+        return false;
+      }
+
+      if (!this.isValidCCCD(item.cccd)) {
+        this.$toasted.show("CCCD không hợp lệ", {
+          duration: 3000,
+          theme: "bubble",
+        });
+        this.$refs.cccdInput[index]?.focus();
+        return false;
+      }
+
+      if (!item.maphuongan || !item.tenphuongan) {
+        this.$toasted.show("Chọn một phương án", {
+          duration: 3000,
+          theme: "bubble",
+        });
+        this.$refs.phuonganSelect[index]?.focus();
+        return false;
+      }
+
+      if (!item.tungay) {
+        this.$toasted.show("Thiếu từ ngày", {
+          duration: 3000,
+          theme: "bubble",
+        });
+        this.$refs.tungayInput[index]?.focus();
+        return false;
+      }
+
+      if (!item.maphuongthucdong || !item.tenphuongthucdong) {
+        this.$toasted.show("Thiếu phương thức đóng", {
+          duration: 3000,
+          theme: "bubble",
+        });
+        this.$refs.phuongthucdongSelect[index]?.focus();
+        return false;
+      }
+
+      if (!item.maquanhuyen || !item.tenquanhuyen) {
+        this.$toasted.show("Thiếu quận huyện", {
+          duration: 3000,
+          theme: "bubble",
+        });
+        this.$refs.quanhuyenSelect[index]?.focus();
+        return false;
+      }
+
+      if (!item.maxaphuong || !item.tenxaphuong) {
+        this.$toasted.show("Thiếu xã phường", {
+          duration: 3000,
+          theme: "bubble",
+        });
+        this.$refs.xaphuongSelect[index]?.focus();
+        return false;
+      }
+
+      if (!item.mabenhvien || !item.tenbenhvien) {
+        this.$toasted.show("Chọn bệnh viện", {
+          duration: 3000,
+          theme: "bubble",
+        });
+        this.$refs.hopInput[index]?.focus();
+        return false;
+      }
+
+      if (!item.hinhthucnap) {
+        this.$toasted.show("Chọn hình thức nạp tiền", {
+          duration: 3000,
+          theme: "bubble",
+        });
+        this.$refs.hinhthucnapInput[index]?.focus();
+        return false;
+      }
+
+      return true;
+    },
+
+    async checkItem(item) {
+      const index = this.items.findIndex((x) => x === item);
+      const isDataValid = await this.checkItemData(item, index);
+
+      if (!isDataValid) return;
+
+      Swal.fire({
+        toast: true,
+        icon: "success",
+        title: "Bản ghi đã đầy đủ dữ liệu!",
+        position: "top-end",
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+      });
+    },
+
+    async checkHgd(item) {
+      if (item.masobhxh === "") {
         const Toast = Swal.mixin({
           toast: true,
           position: "top-end",
@@ -2168,8 +2414,78 @@ export default {
         });
         Toast.fire({
           icon: "success",
-          title: `Bản ghi đã đầy đủ dữ liệu!`,
+          title: `Chưa nhập vào Mã số BHXH`,
         });
+      } else {
+        try {
+          const res = await this.$axios.get(
+            `/api/nguoihuong/tim-kiem-thong-tin-hgd?soBhxh=${item.masobhxh}&SO_DDCN_CCCD_BCA=${item.cccd}`
+          );
+
+          const ttHgd = res.data.thongtinHgd;
+          // console.log(ttHgd);
+
+          Swal.fire({
+            html: `
+              <div>
+                <p><strong style="color: #0d6efd">Thông tin Hộ gia đình</strong></p>
+                <p style="font-weight: 800; color: #dc3545; font-size: 15px">
+                  Mã hộ: ${ttHgd[0].maHoGiaDinh || ""} | Chủ hộ: ${
+              ttHgd[0].chuHo || ""
+            }
+                </p>
+              </div>
+
+              <div style="margin-top: 5px; max-height: 400px; overflow-y: auto;">
+                <table border="1" style="border-collapse: collapse; width: 100%; font-size: 13px;">
+                  <thead style="background-color: #cfe2ff; font-weight: bold; text-align: center;">
+                    <tr>
+                      <th>STT HO</th>
+                      <th>Họ tên</th>
+                      <th>Mã số BHXH</th>
+                      <th>Ngày sinh</th>
+                      <th>Giới tính</th>
+                      <th>Địa chỉ</th>
+                      <th>Mối quan hệ với chủ hộ</th>
+                      <th>Số CCCD</th>
+                      <th>Mã đối tượng</th>
+                      <th>Hạn thẻ</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    ${ttHgd
+                      .map(
+                        (item) => `
+                      <tr style="text-align: center;">
+                        <td>${item.stt_ho || ""}</td>
+                        <td style="text-align: left;">${item.hoTen || ""}</td>
+                        <td>${item.soBhxh || ""}</td>
+                        <td>${item.ngaySinh || ""}</td>
+                        <td>${item.gioiTinh || ""}</td>
+                        <td style="text-align: left;">${item.diaChi || ""}</td>
+                        <td>${item.quanHeChuHo || ""}</td>
+                        <td>${item.SO_DDCN_CCCD_BCA || ""}</td>
+                        <td>${item.maDoiTuongDangTg || ""}</td>
+                        <td style="text-align: center;">${
+                          item.hanThe || ""
+                        }</td>
+                      </tr>
+                    `
+                      )
+                      .join("")}
+                  </tbody>
+                </table>
+              </div>
+            `,
+            width: "90%",
+            confirmButtonText: "Đóng",
+            customClass: {
+              popup: "swal-wide",
+            },
+          });
+        } catch (error) {
+          console.log(error);
+        }
       }
     },
 
@@ -2540,6 +2856,7 @@ export default {
     },
 
     addRow() {
+      this.lockButtonXacnhaninbldt = false;
       try {
         this.items.push({
           matochuc: this.user.matochuc,
@@ -3352,8 +3669,8 @@ export default {
           const fileName = `${hs.sobienlai}_${encodeURIComponent(
             hs.hoten
           )}.pdf`;
-          const pdfUrl = `http://14.224.129.177:1973/bienlaidientu/${hs.urlNameInvoice}.pdf`;
-          // const pdfUrl = `http://localhost:1973/bienlaidientu/${hs.urlNameInvoice}.pdf`;
+          const pdfUrl = `http://14.224.129.177:1970/bienlaidientu/${hs.urlNameInvoice}.pdf`;
+          // const pdfUrl = `http://localhost:1970/bienlaidientu/${hs.urlNameInvoice}.pdf`;
           // console.log(pdfUrl);
 
           window.open(pdfUrl, "_blank");

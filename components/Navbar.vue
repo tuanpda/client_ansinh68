@@ -7,7 +7,9 @@
     <div class="container">
       <div class="navbar-brand">
         <nuxt-link to="/" class="navbar-item">
-          <div style="font-weight: bold; font-size: 20px">AN.SINH.159</div>
+          <div style="font-weight: bold; font-size: 20px; color: #ffe69c">
+            AN.SINH.159
+          </div>
         </nuxt-link>
         <!-- <a href="/" class="navbar-item">
           <img
@@ -131,27 +133,18 @@
                 </span>
                 &ensp; Tra cứu Hồ sơ kê khai
               </nuxt-link> -->
-              <!-- <nuxt-link to="/nhanviendailythu/timkiemhoso" class="navbar-item">
-                <span style="color: #3850b7" class="icon is-small is-left">
-                  <i class="far fa-calendar-alt"></i>
-                </span>
-                &ensp; Tra cứu Hồ sơ kê khai (tìm kiếm)
-              </nuxt-link> -->
               <nuxt-link to="/nhanviendailythu/taokekhai" class="navbar-item">
                 <span style="color: #3850b7" class="icon is-small is-left">
                   <i class="fas fa-file-signature"></i>
                 </span>
                 &ensp; Tạo kê khai
               </nuxt-link>
-              <!-- <nuxt-link
-                to="/nhanviendailythu/quanlylaodong"
-                class="navbar-item"
-              >
+              <nuxt-link to="/nhanviendailythu/hogiadinh" class="navbar-item">
                 <span style="color: #3850b7" class="icon is-small is-left">
                   <i class="fab fa-creative-commons-by"></i>
                 </span>
-                &ensp; Quản lý lao động
-              </nuxt-link> -->
+                &ensp; Tìm kiếm thông tin HGĐ
+              </nuxt-link>
               <nuxt-link
                 to="/nhanviendailythu/tracuuhanthe"
                 class="navbar-item"

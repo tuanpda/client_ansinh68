@@ -222,6 +222,9 @@
                     type="checkbox"
                     v-model="selectedItems"
                     :value="item"
+                    :disabled="
+                      item.status_naptien === true || item.trangthai === 1
+                    "
                   />
                 </td>
 
@@ -409,6 +412,14 @@
                   </table>
                 </div>
               </div>
+              <div style="text-align: end; margin-top: 10px">
+                <button
+                  @click="closeDanhsachduyet()"
+                  class="button is-small is-info"
+                >
+                  Thoát
+                </button>
+              </div>
             </section>
           </div>
         </div>
@@ -481,6 +492,14 @@
                 </div>
               </div>
             </section>
+            <div style="text-align: end; margin-top: 10px">
+              <button
+                @click="closeDanhsachhuyDuyet()"
+                class="button is-small is-info"
+              >
+                Thoát
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -994,8 +1013,6 @@ export default {
 
         // Hiển thị kết quả ra console (bạn có thể dùng để show lên modal)
         this.dulieuPheduyet = ketquaTongHop;
-        this.dulieuHuyPheDuyet = []; // Reset dữ liệu huỷ phê duyệt
-
         this.isActive = true;
       }
     },
@@ -1100,7 +1117,7 @@ export default {
 
       if (isConfirmed && lyDo) {
         // Thực hiện xử lý với lý do
-        console.log("Lý do hủy duyệt:", lyDo);
+        // console.log("Lý do hủy duyệt:", lyDo);
 
         let ketquaTongHop = [];
 
@@ -1154,6 +1171,16 @@ export default {
 
         this.isActive_fix = true;
       }
+    },
+
+    closeDanhsachduyet() {
+      this.dulieuPheduyet = [];
+      this.isActive = false;
+    },
+
+    closeDanhsachhuyDuyet() {
+      this.dulieuHuyPheDuyet = [];
+      this.isActive_fix = false;
     },
 
     // pagi
@@ -1218,8 +1245,8 @@ export default {
           const fileName = `${hs.sobienlai}_${encodeURIComponent(
             hs.hoten
           )}.pdf`;
-          const pdfUrl = `http://14.224.129.177:1973/bienlaidientu/${hs.urlNameInvoice}.pdf`;
-          // const pdfUrl = `http://localhost:1973/bienlaidientu/${hs.urlNameInvoice}.pdf`;
+          const pdfUrl = `http://14.224.129.177:1970/bienlaidientu/${hs.urlNameInvoice}.pdf`;
+          // const pdfUrl = `http://localhost:1970/bienlaidientu/${hs.urlNameInvoice}.pdf`;
           // console.log(pdfUrl);
 
           window.open(pdfUrl, "_blank");
