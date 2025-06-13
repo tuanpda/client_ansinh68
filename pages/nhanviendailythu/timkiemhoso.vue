@@ -350,6 +350,13 @@
         </div>
       </div>
 
+      <!-- Biểu tượng loading -->
+      <div v-if="isLoading" class="loading-overlay">
+        <!-- Biểu tượng loading -->
+        <div class="loading-spinner"></div>
+        <span>waitting some minute ...</span>
+      </div>
+
       <!-- modal dữ liệu đã duyệt -->
       <div class="">
         <div :class="{ 'is-active': isActive }" class="modal">
