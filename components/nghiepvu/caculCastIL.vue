@@ -1892,15 +1892,6 @@ export default {
         return false;
       }
 
-      if (!item.mabenhvien || !item.tenbenhvien) {
-        this.$toasted.show("Chọn bệnh viện", {
-          duration: 3000,
-          theme: "bubble",
-        });
-        this.$refs.hopInput[index]?.focus();
-        return false;
-      }
-
       if (!item.hinhthucnap) {
         this.$toasted.show("Chọn hình thức nạp tiền", {
           duration: 3000,
@@ -2204,6 +2195,7 @@ export default {
               `/api/nguoihuong/tim-kiem-thong-tin-hgd?soBhxh=${masobhxh}&SO_DDCN_CCCD_BCA=''`
             );
             let soCmnd_hgd = "";
+            let dataHgd;
             // console.log(resHGD.data.canhan.SO_DDCN_CCCD_BCA);
             if (resHGD.data.canhan !== null) {
               soCmnd_hgd = resHGD.data.canhan.SO_DDCN_CCCD_BCA;
@@ -2249,28 +2241,39 @@ export default {
               // this.items[index].tungay = formatDate(tuNgay);
               // console.log("🎯 Hạn thẻ từ (tungay):", this.items[index].tungay);
 
-              this.items[index].matinh = data.maTinhLh;
+              const filename = dataHgd.tenFile;
+              const parts = filename.split("_");
+
+              const maTinh = parts[4].replace("TTT", "");
+              const maHuyen = parts[5].replace("HH", "");
+              const maXa = parts[6];
+
+              // console.log("Mã tỉnh:", maTinh); // "42"
+              // console.log("Mã huyện:", maHuyen); // "449"
+              // console.log("Mã xã:", maXa); // "18754"
+
+              this.items[index].matinh = maTinh;
               // đi tìm tên tỉnh
               const res_tinh = await this.$axios.get(
-                `/api/nguoihuong/find-tentinh?matinh=${resHGD.data.data[0].maTinhLh}`
+                `/api/nguoihuong/find-tentinh?matinh=42`
               );
               if (res_tinh.data.length > 0) {
                 this.items[index].tentinh = res_tinh.data[0].tentinh;
                 // console.log(this.items[index].tentinh);
               }
-              this.items[index].maquanhuyen = resHGD.data.data[0].maHuyenLh;
+              this.items[index].maquanhuyen = maHuyen;
               // đi tìm tên quận huyện
               const res_huyen = await this.$axios.get(
-                `/api/nguoihuong/find-tenhuyen?matinh=${resHGD.data.data[0].maTinhLh}&maquanhuyen=${resHGD.data.data[0].maHuyenLh}`
+                `/api/nguoihuong/find-tenhuyen?matinh=${maTinh}&maquanhuyen=${maHuyen}`
               );
               if (res_huyen.data.length > 0) {
                 this.items[index].tenquanhuyen = res_huyen.data[0].tenquanhuyen;
                 // console.log(this.items[index].tenquanhuyen);
               }
-              this.items[index].maxaphuong = resHGD.data.data[0].maXaLh;
+              this.items[index].maxaphuong = maXa;
               // đi tìm tên xã
               const res_xa = await this.$axios.get(
-                `/api/nguoihuong/find-tenxa?matinh=${resHGD.data.data[0].maTinhLh}&maquanhuyen=${resHGD.data.data[0].maHuyenLh}&maxaphuong=${resHGD.data.data[0].maXaLh}`
+                `/api/nguoihuong/find-tenxa?matinh=${maTinh}&maquanhuyen=${maHuyen}&maxaphuong=${maXa}`
               );
               // console.log(res_xa);
 
@@ -2278,17 +2281,7 @@ export default {
                 this.items[index].tenxaphuong = res_xa.data[0].tenxaphuong;
                 // console.log(this.items[index].tenxaphuong);
               }
-              this.items[index].tothon = resHGD.data.data[0].diaChiLh;
-              this.items[index].benhvientinh = resHGD.data.data[0].maTinh;
-              // this.items[index].mabenhvien = data.NoiKhamChuaBenh;
-              // đi tìm tên bệnh viện kcb
-              // const maBv = `${this.matinh}${data.NoiKhamChuaBenh}`;
-              // const res_bv = await this.$axios.get(
-              //   `/api/nguoihuong/find-benhvien?mabenhvien=${maBv}`
-              // );
-              // if (res_bv.data.length > 0) {
-              //   this.items[index].tenbenhvien = res_bv.data[0].tenbenhvien;
-              // }
+              this.items[index].tothon = dataHgd.diaChi;
             } catch (error) {
               console.log(error.message);
             }
