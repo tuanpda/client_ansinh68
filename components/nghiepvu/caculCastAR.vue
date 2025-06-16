@@ -2263,6 +2263,12 @@ export default {
               } catch (error) {
                 console.log(error.message);
               }
+
+              Swal.fire({
+                text: "Không có thông tin cấp thẻ hiện tại của BHXH, đây chỉ là thông tin thẻ hiện đang có trong Hộ gia đình (Hoặc có thể không có). Đề nghị kiểm tra kỹ hồ sơ rồi mới kê khai nhé!",
+                // text: "Đã gửi thông tin hồ sơ lên cổng BHXH VN!",
+                icon: "success",
+              });
             }
           }
           this.isLoading = false;
