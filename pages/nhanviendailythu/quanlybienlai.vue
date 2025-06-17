@@ -47,6 +47,8 @@
             <label class="label">Họ tên</label
             ><input v-model="hoten" type="text" class="input is-small" />
           </div>
+        </div>
+        <div class="columns">
           <div class="column">
             <label class="label">Đại lý</label
             ><input
