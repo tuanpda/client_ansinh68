@@ -6,11 +6,10 @@
           <div class="column is-4 is-offset-4">
             <div class="centered-image">
               <img
-                src="@/assets/logos/ansinh68.png"
+                src="@/assets/logos/logo-login.png"
                 alt="Your Image"
-                width="150"
-                height="150"
-                style="border-radius: 50%"
+                width="500"
+                height="500"
               />
             </div>
             <div class="box" style="margin-top: 10px">
@@ -74,18 +73,18 @@
                   Đăng nhập
                 </button>
               </div>
-              <div class="field" style="padding-top: 10px">
+              <!-- <div class="field" style="padding-top: 10px">
                 <a href="/forgotpassword"
                   ><span class="forgotpas">Quên mật khẩu ?</span></a
                 >
-              </div>
+              </div> -->
             </div>
             <div class="centered-image">
               <img
                 src="@/assets/images/logobhxh.png"
                 alt="Your Image"
-                width="100"
-                height="40"
+                width="60"
+                height="20"
               />
             </div>
           </div>
@@ -100,7 +99,7 @@ import Swal from "sweetalert2";
 export default {
   name: "LoginPage",
   layout: "none",
-
+  auth: "guest",
   data() {
     return {
       username: "",

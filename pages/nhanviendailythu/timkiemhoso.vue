@@ -43,11 +43,17 @@
               <select @change="handleChange">
                 <option selected disabled>- Chọn loại hình -</option>
                 <option value="">Không chọn</option>
-                <option value="AR">Bảo hiểm y tế - Nông lâm - MSTB</option>
-                <option value="BI">Bảo hiểm y tế - HGĐ</option>
-                <option value="IS">Bảo hiểm xã hội tự nguyện</option>
+                <option value="AR">Bảo hiểm y tế - Nông lâm - MSTB (AR)</option>
+                <option value="BI">Bảo hiểm y tế - HGĐ (BI)</option>
+                <option value="IS">Bảo hiểm xã hội tự nguyện (IS)</option>
                 <option value="IL">
-                  Người tham gia lực lượng An ninh cơ sở
+                  Người tham gia lực lượng An ninh cơ sở (IL)
+                </option>
+                <option value="IT">
+                  Bảo hiểm xã hội tự nguyện - ngoại tỉnh (IT)
+                </option>
+                <option value="WI">
+                  BHYT Người tham gia lực lượng An ninh cơ sở (WI)
                 </option>
               </select>
             </div>
@@ -96,7 +102,7 @@
               v-model="sohoso"
               type="text"
               class="input is-small"
-              placeholder="Số hồ sơ đã nạp"
+              placeholder="Số hồ sơ"
             />
           </div>
           <div class="column">
@@ -105,7 +111,7 @@
               v-model="masobhxh"
               type="text"
               class="input is-small"
-              placeholder="Số hồ sơ đã nạp"
+              placeholder="Mã số BHXH"
             />
           </div>
           <div class="column">
@@ -114,7 +120,7 @@
               v-model="hoten"
               type="text"
               class="input is-small"
-              placeholder="Số hồ sơ đã nạp"
+              placeholder="Họ tên"
             />
           </div>
         </div>
