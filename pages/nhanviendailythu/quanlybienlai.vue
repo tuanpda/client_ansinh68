@@ -550,7 +550,7 @@ export default {
       } else {
         try {
           const res = await this.$axios.get(
-            `/api/kekhai/bienlai-search-diemthu?madaily=${this.diemthu}&active=${this.trangthai}&ngaykekhai=${this.ngaykekhaitu}&ngaykekhaiden=${this.ngaykekhaiden}&masobhxh=${this.masobhxh}&hoten=${this.hoten}&tendaily=${this.tendaily}&loaihinh=${this.loaihinh}&page=${page}`
+            `/api/kekhai/bienlai-search-diemthu?madaily=${this.madaily}&active=${this.trangthai}&ngaykekhai=${this.ngaykekhaitu}&ngaykekhaiden=${this.ngaykekhaiden}&masobhxh=${this.masobhxh}&hoten=${this.hoten}&loaihinh=${this.loaihinh}&page=${page}`
           );
           if (res.data.results.length > 0) {
             this.data_kekhai = res.data.results;

@@ -91,37 +91,21 @@
                 min="1"
                 max="12"
                 class="input is-small"
-                placeholder="Đợt kê khai của hồ sơ"
                 v-model="dotkekhai"
               />
             </div>
           </div>
           <div class="column">
             <label class="label">Số hồ sơ</label
-            ><input
-              v-model="sohoso"
-              type="text"
-              class="input is-small"
-              placeholder="Số hồ sơ"
-            />
+            ><input v-model="sohoso" type="text" class="input is-small" />
           </div>
           <div class="column">
             <label class="label">Mã số BHXH</label
-            ><input
-              v-model="masobhxh"
-              type="text"
-              class="input is-small"
-              placeholder="Mã số BHXH"
-            />
+            ><input v-model="masobhxh" type="text" class="input is-small" />
           </div>
           <div class="column">
             <label class="label">Họ tên</label
-            ><input
-              v-model="hoten"
-              type="text"
-              class="input is-small"
-              placeholder="Họ tên"
-            />
+            ><input v-model="hoten" type="text" class="input is-small" />
           </div>
         </div>
         <div class="columns">
