@@ -49,7 +49,7 @@
           </div>
         </div>
         <div class="columns">
-          <div class="column">
+          <div class="column is-3">
             <label class="label">Đại lý</label
             ><input
               :disabled="isDiemthu"
@@ -58,7 +58,7 @@
               class="input is-small"
             />
           </div>
-          <div class="column">
+          <div class="column is-3">
             <label class="label">Loại hình</label
             ><input v-model="loaihinh" type="text" class="input is-small" />
           </div>
