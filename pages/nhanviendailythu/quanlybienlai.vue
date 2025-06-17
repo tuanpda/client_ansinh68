@@ -132,14 +132,14 @@
                 <td style="text-align: center">{{ index + 1 }}</td>
                 <td style="">{{ item._id }}</td>
                 <td style="text-align: center">
-                  <template v-if="item.active === 1">
+                  <template v-if="item.active === true">
                     <span style="font-weight: 700; color: #ffc107"
-                      >Đã huỷ duyệt</span
-                    ></template
-                  >
+                      >Đã phê duyệt</span
+                    >
+                  </template>
                   <template v-else>
                     <span style="font-weight: 700; color: #ffc107"
-                      >Đã huỷ duyệt</span
+                      >Đã huỷ hoặc chưa duyệt</span
                     >
                   </template>
                 </td>

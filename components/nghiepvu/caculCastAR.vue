@@ -218,7 +218,11 @@
                 />
               </td> -->
               <td style="text-align: center">
-                <input v-model="hanthecu" type="text" class="input is-small" />
+                <input
+                  v-model="item.hanthecu"
+                  type="text"
+                  class="input is-small"
+                />
               </td>
               <td style="text-align: center">
                 <div class="select is-fullwidth is-small">
@@ -1850,139 +1854,6 @@ export default {
   },
 
   methods: {
-    async findNguoihuongTest(masobhxh, index) {
-      const resHGD = await this.$axios.get(
-        `/api/nguoihuong/tim-kiem-thong-tin-hgd?soBhxh=${masobhxh}&SO_DDCN_CCCD_BCA=''`
-      );
-      // console.log(resHGD);
-      if (resHGD.data.canhan !== null) {
-        // console.log(resHGD);
-        this.isLoading = false;
-        const data = resHGD.data.canhan;
-        try {
-          this.items[index].hoten = data.hoTen;
-          this.items[index].ngaysinh = data.ngaySinh;
-          // console.log(typeof data.gioiTinh);
-          this.items[index].cccd = data.SO_DDCN_CCCD_BCA;
-          this.items[index].gioitinh = data.gioiTinh;
-          this.items[index].dienthoai = data.soDienThoai;
-
-          if (data.hanThe !== "") {
-            this.hanthecu = data.hanThe.split("-")[1]; // Kết quả: "31/12/2025"
-
-            // this.hanthecu = "11/01/2024"; // dùng để test
-            // console.log(this.hanthecu);
-            // Hàm parse định dạng dd/mm/yyyy thành Date
-            const parseDate = (str) => {
-              const [day, month, year] = str.split("/").map(Number);
-              return new Date(year, month - 1, day);
-            };
-
-            // Hàm format Date về dd/mm/yyyy
-            const formatDate = (date) => {
-              const d = String(date.getDate()).padStart(2, "0");
-              const m = String(date.getMonth() + 1).padStart(2, "0");
-              const y = date.getFullYear();
-              return `${d}/${m}/${y}`;
-            };
-
-            const today = new Date();
-            const denNgay = parseDate(this.hanthecu);
-            const bienLai = today;
-
-            // console.log(denNgay);
-
-            let tuNgay;
-
-            if (denNgay >= today) {
-              // Chưa hết hạn → ngày kế tiếp
-              const nextDay = new Date(denNgay);
-              nextDay.setDate(nextDay.getDate() + 1);
-              tuNgay = nextDay;
-            } else {
-              const daysDiff = (today - denNgay) / (1000 * 60 * 60 * 24);
-              if (daysDiff > 90) {
-                // Hết hạn > 3 tháng → sau hôm nay 30 ngày
-                const next30 = new Date();
-                next30.setDate(next30.getDate() + 30);
-                tuNgay = next30;
-              } else {
-                // Hết hạn < 3 tháng → dùng ngày biên lai
-                tuNgay = bienLai;
-              }
-            }
-
-            this.items[index].tungay = formatDate(tuNgay);
-            console.log("🎯 Hạn thẻ từ (tungay):", this.items[index].tungay);
-          } else {
-            this.hanthecu = "Không tìm thấy hạn thẻ cũ";
-            // Gán ngày hiện tại + 30 ngày
-            const today = new Date();
-            const next30 = new Date();
-            next30.setDate(today.getDate() + 30);
-
-            const formatDate = (date) => {
-              const d = String(date.getDate()).padStart(2, "0");
-              const m = String(date.getMonth() + 1).padStart(2, "0");
-              const y = date.getFullYear();
-              return `${d}/${m}/${y}`;
-            };
-
-            this.items[index].tungay = formatDate(next30);
-            console.log(
-              "⚠️ Không có hạn thẻ → gán tungay:",
-              this.items[index].tungay
-            );
-          }
-
-          const filename = data.tenFile;
-          const parts = filename.split("_");
-
-          const maTinh = parts[4].replace("TTT", "");
-          const maHuyen = parts[5].replace("HH", "");
-          const maXa = parts[6];
-
-          // console.log("Mã tỉnh:", maTinh); // "42"
-          // console.log("Mã huyện:", maHuyen); // "449"
-          // console.log("Mã xã:", maXa); // "18754"
-
-          this.items[index].matinh = maTinh;
-          // đi tìm tên tỉnh
-          const res_tinh = await this.$axios.get(
-            `/api/nguoihuong/find-tentinh?matinh=42`
-          );
-          if (res_tinh.data.length > 0) {
-            this.items[index].tentinh = res_tinh.data[0].tentinh;
-            // console.log(this.items[index].tentinh);
-          }
-          this.items[index].maquanhuyen = maHuyen;
-          // đi tìm tên quận huyện
-          const res_huyen = await this.$axios.get(
-            `/api/nguoihuong/find-tenhuyen?matinh=${maTinh}&maquanhuyen=${maHuyen}`
-          );
-          if (res_huyen.data.length > 0) {
-            this.items[index].tenquanhuyen = res_huyen.data[0].tenquanhuyen;
-            // console.log(this.items[index].tenquanhuyen);
-          }
-          this.items[index].maxaphuong = maXa;
-          // đi tìm tên xã
-          const res_xa = await this.$axios.get(
-            `/api/nguoihuong/find-tenxa?matinh=${maTinh}&maquanhuyen=${maHuyen}&maxaphuong=${maXa}`
-          );
-          // console.log(res_xa);
-
-          if (res_xa.data.length > 0) {
-            this.items[index].tenxaphuong = res_xa.data[0].tenxaphuong;
-            // console.log(this.items[index].tenxaphuong);
-          }
-          this.items[index].tothon = data.diaChi;
-          this.items[index].benhvientinh = maTinh;
-        } catch (error) {
-          console.log(error.message);
-        }
-      }
-    },
-
     async findNguoihuong(masobhxh, index) {
       if (masobhxh !== "") {
         const isDuplicate = this.items.some(
@@ -2052,7 +1923,7 @@ export default {
 
               // CODE TÌM HẠN THẺ TỪ 05/06/2025
               // gán hạn thẻ cũ lên form
-              this.hanthecu = data.denNgay;
+              this.items[index].hanthecu = data.denNgay;
               const denNgayStr = data.denNgay; // vd: "10/10/2024"
               // const denNgayStr = "15/03/2025";
 
@@ -2149,8 +2020,8 @@ export default {
                 this.items[index].gioitinh = data.gioiTinh;
                 this.items[index].dienthoai = data.soDienThoai;
 
-                if (data.hanThe !== "") {
-                  this.hanthecu = data.hanThe.split("-")[1]; // Kết quả: "31/12/2025"
+                if (data.hanThe !== null && data.hanThe !== "") {
+                  this.items[index].hanthecu = data.hanThe.split("-")[1]; // Kết quả: "31/12/2025"
 
                   // this.hanthecu = "31/04/2025"; -- dùng để test
                   // console.log(this.hanthecu);
@@ -2169,7 +2040,7 @@ export default {
                   };
 
                   const today = new Date();
-                  const denNgay = parseDate(this.hanthecu);
+                  const denNgay = parseDate(this.items[index].hanthecu);
                   const bienLai = today;
 
                   // console.log(denNgay);
@@ -2197,7 +2068,7 @@ export default {
                   this.items[index].tungay = formatDate(tuNgay);
                   // console.log("🎯 Hạn thẻ từ (tungay):", this.items[index].tungay);
                 } else {
-                  this.hanthecu = "Không tìm thấy hạn thẻ cũ";
+                  this.items[index].hanthecu = "Không tìm thấy hạn thẻ cũ";
                   // Gán ngày hiện tại + 30 ngày
                   const today = new Date();
                   const next30 = new Date();
@@ -3067,6 +2938,7 @@ export default {
           status_hosoloi: 0,
           status_naptien: 0,
           hinhthucnap: 1,
+          hanthecu: "",
         });
 
         // console.log(this.items)
