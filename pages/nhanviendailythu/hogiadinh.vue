@@ -46,6 +46,16 @@
             </span>
             <span>Tìm kiếm</span>
           </button>
+          <button
+            :disabled="dulieuHgd.length === 0"
+            @click="exportExecl()"
+            class="button is-info is-small"
+          >
+            <span class="icon">
+              <i class="far fa-file-excel"></i>
+            </span>
+            <span>Xuất Execl</span>
+          </button>
         </footer>
       </div>
 
@@ -182,6 +192,8 @@
 
 <script>
 import Swal from "sweetalert2";
+import * as XLSX from "xlsx";
+import { saveAs } from "file-saver";
 
 export default {
   components: {},
@@ -286,6 +298,63 @@ export default {
       } catch (error) {
         console.log(error);
       }
+    },
+
+    async exportExecl() {
+      if (!this.dulieuHgd || this.dulieuHgd.length === 0) {
+        alert("Không có dữ liệu hộ gia đình để xuất.");
+        return;
+      }
+
+      // Tạo header theo đúng mẫu
+      const header = [
+        "STT",
+        "Họ và tên",
+        "Mã số BHXH",
+        "Ngày tháng năm sinh",
+        "Giới tính",
+        "Quốc tịch",
+        "Dân tộc",
+        "Nơi đăng ký khai sinh",
+        "Mối quan hệ với chủ hộ",
+        "Số CCCD/ĐDCN/Hộ chiếu",
+        "Ghi chú",
+      ];
+
+      // Duyệt dữ liệu và tạo từng dòng
+      const data = this.dulieuHgd.map((item, index) => {
+        return {
+          STT: index + 1,
+          "Họ và tên": item.hoTen || "",
+          "Mã số BHXH": item.soBhxh || "",
+          "Ngày tháng năm sinh": item.ngaySinh || "",
+          "Giới tính": item.gioiTinh || "",
+          "Quốc tịch": "",
+          "Dân tộc": "",
+          "Nơi đăng ký khai sinh": item.diaChi || "",
+          "Mối quan hệ với chủ hộ": item.quanHeChuHo || "",
+          "Số CCCD/ĐDCN/Hộ chiếu": item.SO_DDCN_CCCD_BCA || "",
+          "Ghi chú": "",
+        };
+      });
+
+      // Chuyển thành worksheet
+      const worksheet = XLSX.utils.json_to_sheet(data, { header });
+
+      // Thêm header tay (để đảm bảo đúng thứ tự)
+      XLSX.utils.sheet_add_aoa(worksheet, [header], { origin: "A1" });
+
+      // Tạo workbook và lưu
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, "HoGiaDinh");
+      const excelBuffer = XLSX.write(workbook, {
+        bookType: "xlsx",
+        type: "array",
+      });
+      saveAs(
+        new Blob([excelBuffer], { type: "application/octet-stream" }),
+        "hogiadinh.xlsx"
+      );
     },
   },
 };
